@@ -36,3 +36,5 @@
  GET /project/hackathon 200 in 47ms
  GET / 200 in 22ms
  GET /project/contact 200 in 42ms
+ ✓ Compiled in 475ms (1840 modules)
+ GET /project/contact 200 in 136ms
