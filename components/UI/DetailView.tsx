@@ -190,14 +190,31 @@ export function DetailView({ card }: { card: ResumeCard }) {
           <div data-detail className="mt-10 border-t border-hairline pt-10">
             <div className="max-w-2xl text-base leading-relaxed text-[#c9c8c4] sm:text-lg space-y-4">
               {card.description.split('\n').map((paragraph, i) => {
-                // Parse bold text
-                const parts = paragraph.split(/(\*\*.*?\*\*)/g);
+                // Parse markdown links [text](url) and bold **text**
+                // We'll use a regex that matches either a link or bold text
+                const parts = paragraph.split(/(\[.*?\]\(.*?\)|\*\*.*?\*\*)/g);
                 return (
                   <p key={i}>
                     {parts.map((part, j) => {
                       if (part.startsWith('**') && part.endsWith('**')) {
                         return <strong key={j} className="text-white font-medium">{part.slice(2, -2)}</strong>;
                       }
+                      
+                      const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
+                      if (linkMatch) {
+                        return (
+                          <a 
+                            key={j} 
+                            href={linkMatch[2]} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-white underline decoration-white/30 underline-offset-4 hover:decoration-white transition-colors"
+                          >
+                            {linkMatch[1]}
+                          </a>
+                        );
+                      }
+                      
                       return part;
                     })}
                   </p>
