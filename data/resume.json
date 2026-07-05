@@ -1,0 +1,338 @@
+{
+  "profile": {
+    "name": "Varun NS",
+    "role": "Product & Digital Transformation",
+    "email": "varun99ns@gmail.com",
+    "tagline": "An interactive resume — drag to explore the sphere."
+  },
+  "sections": [
+    {
+      "title": "About Me",
+      "cards": [
+        {
+          "slug": "about-me",
+          "title": "About Me",
+          "subtitle": "Product leader with an engineer's brain",
+          "year": "2026",
+          "category": [
+            "PROFILE",
+            "STORY"
+          ],
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=900&auto=format&fit=crop",
+          "description": "I build products and run transformations at the intersection of operations, data and design. Eight years in, I still believe the best product decisions come from sitting next to the people who use the thing. This sphere is my career — every card is a chapter. Drag around, get lost, click anything."
+        },
+        {
+          "slug": "languages",
+          "title": "Languages",
+          "subtitle": "Human ones, not just SQL",
+          "year": "PROFILE",
+          "category": [
+            "PROFILE",
+            "COMMS"
+          ],
+          "image": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=900&auto=format&fit=crop",
+          "description": "English and Hindi professionally, Kannada natively. Comfortable presenting to a boardroom or debugging a requirement in the language the site team actually thinks in."
+        },
+        {
+          "slug": "download-resume",
+          "title": "Download Resume",
+          "subtitle": "Get the PDF version",
+          "year": "2026",
+          "category": [
+            "RESUME",
+            "PDF"
+          ],
+          "image": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=900&auto=format&fit=crop",
+          "description": "Click the button below to download a PDF copy of my traditional resume."
+        }
+      ]
+    },
+    {
+      "title": "Work Experience",
+      "cards": [
+        {
+          "slug": "byjus",
+          "title": "Byju's",
+          "subtitle": "Business Development Associate",
+          "year": "Mar 2019 - Jun 2019",
+          "category": [
+            "EXPERIENCE",
+            "SALES"
+          ],
+          "image": "/byjus.png",
+          "description": "• Led customer acquisition initiatives by conducting product demonstrations and providing ongoing client support across Kolar, Tumkur, Mysore, and Chamarajanagar regions, fostering trust and enhancing the overall user experience.\n• Onboarded 22 clients, generating over 15 lakhs in revenue, and consistently ranked as one of the top 2 performers in the team.\n• Consistently exceeded sales targets on both a monthly and quarterly basis, driving business growth and contributing significantly to the team’s success.\n• Trained and mentored 3 interns, equipping them with effective product demonstration skills to drive team success.\n\n**Location:** Bangalore"
+        },
+        {
+          "slug": "sodexo",
+          "title": "Sodexo",
+          "subtitle": "Innovation Lead",
+          "year": "Nov 2025 - Present",
+          "category": [
+            "EXPERIENCE",
+            "ENTERPRISE"
+          ],
+          "image": "/sodexo.jpg",
+          "description": "**Led digital transformation initiatives across facilities and food services** — moving paper-based site operations onto connected platforms.\n\n• Shipped tooling used daily across dozens of client sites.\n• Turned service-level reporting from a monthly scramble into a live dashboard habit.\n• Managed cross-functional delivery between local operations and offshore engineering."
+        },
+        {
+          "slug": "genpact",
+          "title": "Genpact",
+          "subtitle": "Assistant Manager - Lean Digital Transformation",
+          "year": "Jun 2023 - Nov 2025",
+          "category": [
+            "EXPERIENCE",
+            "TRANSFORMATION"
+          ],
+          "image": "/genpact.jpg",
+          "description": "• Developed a Transformation Tracker Dashboard using Power BI, serving as the single source of truth for leadership, overseeing all transformation projects across all service lines which included 40+ clients.\n• Led improvement projects across 4 client accounts, working closely with clients and internal teams to drive efficiency and deliver measurable impact.\n• Selected as the youngest global Agentic AI demo jockey at Genpact, trusted to lead client-facing demonstrations of $1.5M+ high-value Agentic AI offerings, contributing to customer acquisition and enterprise-level deal conversions.\n• Increased auto-posting rates from 35% to 50% and 15% to 25% across two client accounts, eliminating manual efforts from receiving to payment processing of an invoice, leading to a $150k in client Value.\n• Enhanced Helpdesk accuracy from 85% to 98% by creating and rigorously executing a 30-60-90 day improvement plan, eliminating inefficiencies and optimizing support processes.\n• Reduced Direct Debit and GRNI balances, implementing a Problem-Solving Report (PSR) and consistently following up with vendors and clients, generating $35M+ in value.\n• Led automation initiatives, including the implementation of tools such as language translation, duplicate payment detection, sentiment analysis, and Payment proposal creation in SAP, while also programming VBA macros to automate manual processes, delivering a $100k+ productivity benefit.\n• Automated reporting using Power BI, streamlining client reporting, and enhancing issue analysis for seamless weekly updates.\n• Implemented lean methodologies such as PSR, Daily Management, Value Stream Mapping (VSM), Value Generation Roadmap (VGR), and FMEA to identify critical pain points and improve key metrics like Paid On Time %, Holds, and Cost per Invoice.\n• Implemented Daily Huddles and Lean training programs (70% adoption in 4 months) for frontline managers, enhancing problem-solving and efficiency while driving corporate communications and reporting."
+        },
+        {
+          "slug": "care-health",
+          "title": "CARE Health",
+          "subtitle": "International Business (Market Research)",
+          "year": "Apr 2022 - Jun 2022",
+          "category": [
+            "EXPERIENCE",
+            "RESEARCH"
+          ],
+          "image": "/care_health.png",
+          "description": "• Conducted in-depth market research on the health insurance sector across Jordan, Qatar, Bahrain, Saudi Arabia, and Oman, providing actionable insights into potential growth opportunities for the company in these regions.\n• Presented comprehensive research findings and market analysis to the International Business Head, playing a key role in refining expansion strategies and narrowing down options to two strategic countries.\n• Analyzed health insurance plans from providers in Dubai, Abu Dhabi, and Fujairah, delivering strategic recommendations to enhance and optimize CHIL's offerings in the competitive market.\n\n**Location:** Gurgaon"
+        }
+      ]
+    },
+    {
+      "title": "Education",
+      "cards": [
+        {
+          "slug": "mba",
+          "title": "MBA",
+          "subtitle": "PGDM(MBA), IMT Ghaziabad",
+          "year": "2021-2023",
+          "category": [
+            "EDUCATION",
+            "STRATEGY"
+          ],
+          "image": "/imt.jpg",
+          "description": "Went back to school to put language and frameworks around what I'd learned on the floor — corporate strategy, finance, organisational behaviour. Left with a sharper sense of how decisions actually get made in large organisations."
+        },
+        {
+          "slug": "engineering",
+          "title": "Engineering",
+          "subtitle": "Bachelors of Engineering (Information Science)",
+          "year": "2018",
+          "category": [
+            "EDUCATION",
+            "FOUNDATION"
+          ],
+          "image": "/sjb.jpeg",
+          "description": "**Bachelors of Engineering (Information Science), SJBIT Bangalore.**\n\nAn engineering degree taught me to decompose problems, respect constraints, and distrust any answer that arrives too easily. It's why I can sit in an architecture review and hold my own — and why I never hand-wave feasibility."
+        }
+      ]
+    },
+    {
+      "title": "Projects",
+      "cards": [
+        {
+          "slug": "projects",
+          "title": "Projects",
+          "subtitle": "Selected work & side quests",
+          "year": "INDEX",
+          "category": [
+            "WORK",
+            "PORTFOLIO"
+          ],
+          "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=900&auto=format&fit=crop",
+          "description": "A running index of shipped work — internal platforms, analytics products, automation pilots, and the occasional weekend experiment like the site you're standing inside right now."
+        },
+        {
+          "slug": "digital-transformation",
+          "title": "Digital Transformation",
+          "subtitle": "From paper trails to platforms",
+          "year": "CRAFT",
+          "category": [
+            "STRATEGY",
+            "CHANGE"
+          ],
+          "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=900&auto=format&fit=crop",
+          "description": "Transformation isn't a software rollout — it's a behaviour change program with software attached. I run it as both: process mapping and tech selection on one track, champions, training and feedback loops on the other."
+        },
+        {
+          "slug": "applied-ai",
+          "title": "Applied AI",
+          "subtitle": "LLMs as product material",
+          "year": "2023–26",
+          "category": [
+            "AI",
+            "PRODUCT"
+          ],
+          "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=900&auto=format&fit=crop",
+          "description": "**I treat large language models as a design material, not magic.**\n\n• Shipped internal copilots for service and operations teams.\n• Built robust evaluation harnesses before scaling to production.\n• Learned where AI genuinely removes toil versus where it just relocates it."
+        },
+        {
+          "slug": "hackathon",
+          "title": "Hackathon Win",
+          "subtitle": "48 hours to a funded prototype",
+          "year": "2023",
+          "category": [
+            "MILESTONE",
+            "AI"
+          ],
+          "image": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=900&auto=format&fit=crop",
+          "description": "Won an internal hackathon with an AI triage assistant for service requests. The demo earned a small budget, the pilot earned a real one, and the tool is still in use — proof that speed and rigour aren't opposites."
+        },
+        {
+          "slug": "rpa",
+          "title": "RPA Programs",
+          "subtitle": "Bots for the boring parts",
+          "year": "2019–22",
+          "category": [
+            "PROCESS",
+            "TOOLING"
+          ],
+          "image": "https://images.unsplash.com/photo-1535378917042-10a22c95931a?q=80&w=900&auto=format&fit=crop",
+          "description": "Scoped and delivered robotic process automation for finance and operations back offices. Learned the hard lessons early: stabilise the process first, automate second, and monitor forever."
+        },
+        {
+          "slug": "this-website",
+          "title": "This Website",
+          "subtitle": "A resume you can stand inside",
+          "year": "2026",
+          "category": [
+            "PROJECT",
+            "CRAFT"
+          ],
+          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=900&auto=format&fit=crop",
+          "description": "Built with Next.js, React Three Fiber and GSAP — a spherical gallery with custom inertial camera controls, canvas-generated card textures, and handcrafted transitions. Yes, it's over-engineered. That's the point."
+        }
+      ]
+    },
+    {
+      "title": "Certifications",
+      "cards": [
+        {
+          "slug": "certifications",
+          "title": "Certifications",
+          "subtitle": "CSPO · SQL · Generative AI",
+          "year": "2019–25",
+          "category": [
+            "EDUCATION",
+            "PROOF"
+          ],
+          "image": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=900&auto=format&fit=crop",
+          "description": "Certified Scrum Product Owner, advanced SQL for data analysis, and recent certifications in generative AI for product teams. I collect credentials the way I collect tools — only when I intend to use them."
+        }
+      ]
+    },
+    {
+      "title": "Skills",
+      "cards": [
+        {
+          "slug": "artificial-intelligence",
+          "title": "Artificial Intelligence",
+          "subtitle": "AI Strategy & Implementation",
+          "year": "CORE",
+          "category": [
+            "SKILLS",
+            "AI"
+          ],
+          "image": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=900&auto=format&fit=crop",
+          "description": "Leveraging AI for business automation, developing agentic AI solutions, and evaluating language models to drive real-world impact."
+        },
+        {
+          "slug": "product-sense",
+          "title": "Product Sense, Innovation",
+          "subtitle": "Building what matters",
+          "year": "CORE",
+          "category": [
+            "SKILLS",
+            "PRODUCT"
+          ],
+          "image": "https://images.unsplash.com/photo-1512758017271-d7b84c2113f1?q=80&w=900&auto=format&fit=crop",
+          "description": "Deep understanding of user needs, framing market strategies, structuring outcome-first roadmaps, and prioritizing impactful features."
+        },
+        {
+          "slug": "sql",
+          "title": "SQL",
+          "subtitle": "Data extraction & analysis",
+          "year": "CORE",
+          "category": [
+            "SKILLS",
+            "DATA"
+          ],
+          "image": "https://images.unsplash.com/photo-1555099962463-3372118ddf39?q=80&w=900&auto=format&fit=crop",
+          "description": "Fluent in interrogating business data using SQL, optimizing queries, and translating raw tables into actionable insights."
+        },
+        {
+          "slug": "power-bi",
+          "title": "Power BI",
+          "subtitle": "Dashboards & Visualization",
+          "year": "CORE",
+          "category": [
+            "SKILLS",
+            "DATA"
+          ],
+          "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=900&auto=format&fit=crop",
+          "description": "Building robust Power BI models and designing KPI frameworks that change Monday morning decisions."
+        },
+        {
+          "slug": "digital-transformation-skill",
+          "title": "Digital Transformation & Automation",
+          "subtitle": "Process engineering",
+          "year": "CORE",
+          "category": [
+            "SKILLS",
+            "STRATEGY"
+          ],
+          "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=900&auto=format&fit=crop",
+          "description": "Moving paper-based operations onto connected platforms and implementing tooling that drives productivity and efficiency."
+        },
+        {
+          "slug": "lean-methodologies",
+          "title": "Lean Methodologies",
+          "subtitle": "PSR, VSM, Kaizen, VGR",
+          "year": "CORE",
+          "category": [
+            "SKILLS",
+            "PROCESS"
+          ],
+          "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=900&auto=format&fit=crop",
+          "description": "Implementing lean methodologies such as PSR, Daily Management, Value Stream Mapping (VSM), Value Generation Roadmap (VGR), and FMEA to identify critical pain points."
+        }
+      ]
+    },
+    {
+      "title": "Hobbies",
+      "cards": [
+        {
+          "slug": "volunteering",
+          "title": "Volunteering",
+          "subtitle": "Skills, donated",
+          "year": "ONGOING",
+          "category": [
+            "COMMUNITY",
+            "PEOPLE"
+          ],
+          "image": "https://images.unsplash.com/photo-1559027615-cd4628902d4a?q=80&w=900&auto=format&fit=crop",
+          "description": "Digital-literacy workshops and pro-bono analytics for local non-profits. Working with tiny budgets and huge constraints is the purest product training there is."
+        }
+      ]
+    },
+    {
+      "title": "Contact",
+      "cards": [
+        {
+          "slug": "contact",
+          "title": "Contact",
+          "subtitle": "Let's build something",
+          "year": "NOW",
+          "category": [
+            "CONTACT",
+            "OPEN"
+          ],
+          "image": "https://images.unsplash.com/photo-1516387938699-a93567ec168e?q=80&w=900&auto=format&fit=crop",
+          "description": "The fastest route is email — varun99ns@gmail.com. I'm open to product and transformation roles where the problem is messy, the stakes are real, and the team is serious about craft."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+  background: #050505;
+  color: #f2f1ee;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(242, 241, 238, 0.9);
+  color: #050505;
+}
+
+/* Focus visibility for keyboard users — never removed, only styled. */
+:focus-visible {
+  outline: 1.5px solid rgba(242, 241, 238, 0.85);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* The WebGL canvas owns its gestures. */
+canvas {
+  touch-action: none;
+  display: block;
+}
+
+/* Film grain — a static SVG noise tile; drift handled by GSAP. */
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Vignette pulls the eye toward the middle of the room. */
+.vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 52%,
+    rgba(0, 0, 0, 0.32) 88%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+/* Thin, quiet scrollbar for the detail reader. */
+.detail-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.detail-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+.detail-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .has-custom-cursor,
+  .has-custom-cursor * {
+    cursor: none !important;
+  }
+}

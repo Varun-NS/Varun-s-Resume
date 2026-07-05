@@ -1,0 +1,38 @@
+
+> stunning-resume@1.0.0 dev
+> next dev
+
+   ▲ Next.js 15.5.20
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.4:3000
+
+ ✓ Starting...
+ ✓ Ready in 1111ms
+ ○ Compiling / ...
+ ✓ Compiled / in 908ms (1822 modules)
+ GET / 200 in 1159ms
+ ✓ Compiled /project/[slug] in 491ms (1840 modules)
+ GET /project/digital-transformation-skill 200 in 1043ms
+ GET / 200 in 40ms
+ GET /project/contact 200 in 34ms
+ GET / 200 in 22ms
+ GET /project/languages 200 in 26ms
+ GET / 200 in 22ms
+ ✓ Compiled in 558ms (857 modules)
+ ✓ Compiled in 114ms (857 modules)
+ ✓ Compiled in 83ms (857 modules)
+ ✓ Compiled in 430ms (1860 modules)
+ ✓ Compiled in 246ms (1854 modules)
+ ✓ Compiled in 219ms (1854 modules)
+ ✓ Compiled in 75ms (857 modules)
+ GET / 200 in 258ms
+ GET / 200 in 70ms
+ GET / 200 in 27ms
+ GET / 200 in 26ms
+ GET / 200 in 76ms
+ GET / 200 in 57ms
+ GET / 200 in 79ms
+ GET / 200 in 129ms
+ GET /project/hackathon 200 in 47ms
+ GET / 200 in 22ms
+ GET /project/contact 200 in 42ms
