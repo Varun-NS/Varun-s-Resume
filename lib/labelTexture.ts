@@ -28,10 +28,11 @@ export async function createLabelTexture(
   ctx.fillText(title.toUpperCase(), width / 2, height / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
-  texture.minFilter = THREE.LinearFilter;
+  // Power-of-two canvas — mipmaps keep the title smooth at any distance.
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.anisotropy = gl.capabilities.getMaxAnisotropy();
-  texture.generateMipmaps = false;
+  texture.generateMipmaps = true;
 
   return texture;
 }

@@ -29,7 +29,9 @@ function SectionLabel({ section }: { section: SectionPlacement }) {
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
 
   const basePosition = useMemo(
-    () => new THREE.Vector3(...section.labelPosition).multiplyScalar(0.7), // Float slightly in front of cards, positioned above the grid
+    // Nearly on the card shell: floating far in front reads fine from the
+    // sphere's centre but drifts out of frame once the camera zooms in.
+    () => new THREE.Vector3(...section.labelPosition).multiplyScalar(0.95),
     [section.labelPosition]
   );
 

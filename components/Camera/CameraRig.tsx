@@ -30,6 +30,9 @@ export function CameraRig() {
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
   const dragRef = useRef(false);
+  // 0..1 swell fed by raw pointer speed (drag or not) and decayed every
+  // frame — this is what makes the warp sound follow the mouse itself.
+  const warpEnergy = useRef(0);
 
   useEffect(() => {
     camera.rotation.order = "YXZ";
@@ -41,6 +44,9 @@ export function CameraRig() {
     let lastY = 0;
     let lastT = 0;
     let dragDistance = 0;
+    let moveX = 0;
+    let moveY = 0;
+    let moveT = 0;
 
     const onPointerDown = (e: PointerEvent) => {
       if (!cameraState.inputEnabled || !e.isPrimary) return;
@@ -63,6 +69,23 @@ export function CameraRig() {
         cameraState.parallaxX = (e.clientX / window.innerWidth) * 2 - 1;
         cameraState.parallaxY = (e.clientY / window.innerHeight) * 2 - 1;
       }
+
+      // Raw pointer speed feeds the warp swell whether or not the visitor is
+      // dragging. Gaps over 120ms mean the pointer left and came back — a
+      // teleport, not a gesture — so those samples are dropped.
+      const nowMove = performance.now();
+      const dtMove = nowMove - moveT;
+      if (moveT !== 0 && dtMove > 0 && dtMove < 120) {
+        const speed =
+          Math.hypot(e.clientX - moveX, e.clientY - moveY) / dtMove; // px/ms
+        warpEnergy.current = Math.max(
+          warpEnergy.current,
+          Math.min(1, speed / 2.5)
+        );
+      }
+      moveX = e.clientX;
+      moveY = e.clientY;
+      moveT = nowMove;
 
       if (!dragRef.current || !e.isPrimary) return;
       const now = performance.now();
@@ -106,6 +129,12 @@ export function CameraRig() {
       // Cap throw speed so a violent flick still feels controlled.
       cameraState.velocityYaw = clamp(cameraState.velocityYaw, -3.2, 3.2);
       cameraState.velocityPitch = clamp(cameraState.velocityPitch, -2.4, 2.4);
+
+      // A real throw gets the long echoing swipe tail; a gentle release
+      // stays silent and lets the whoosh bed cover it.
+      const throwSpeed =
+        Math.abs(cameraState.velocityYaw) + Math.abs(cameraState.velocityPitch);
+      if (throwSpeed > 0.9) audio.swipe(Math.min(1, throwSpeed / 3.5));
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -180,9 +209,17 @@ export function CameraRig() {
     const gripTarget = dragRef.current && !reduced ? 1 : 0;
     s.grip = damp(s.grip, gripTarget, dragRef.current ? 6 : 3, dt);
 
-    // The wind bed swells with the camera's energy — grip plus spin.
-    audio.setWind(
-      s.grip * 0.3 + Math.min(0.7, (Math.abs(s.velocityYaw) + Math.abs(s.velocityPitch)) * 0.35)
+    // Pointer speed plus the camera's own energy (grip and spin) feeds the
+    // whoosh trigger; the decay keeps one gesture from double-firing it.
+    warpEnergy.current *= Math.exp(-2.2 * dt);
+    if (warpEnergy.current < 0.001) warpEnergy.current = 0;
+    audio.setWarp(
+      Math.min(
+        1,
+        warpEnergy.current * 0.85 +
+          s.grip * 0.25 +
+          (Math.abs(s.velocityYaw) + Math.abs(s.velocityPitch)) * 0.3
+      )
     );
 
     const parallaxScale = reduced ? 0 : s.drift;

@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import type { CardPlacement } from "@/lib/sphere";
@@ -193,7 +193,103 @@ export const GalleryCard = memo(function GalleryCard({
         onClick={handleClick}
       >
         <planeGeometry args={[width, height]} />
+        {card.eyebrow && <CardEyebrow eyebrow={card.eyebrow} width={width} height={height} anim={anim} material={material} />}
       </mesh>
     </group>
   );
 });
+
+function CardEyebrow({ eyebrow, width, height, anim, material: parentMaterial }: { eyebrow: string; width: number; height: number; anim: any; material: THREE.MeshBasicMaterial }) {
+  const gl = useThree((s) => s.gl);
+  const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  const material = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0,
+        depthTest: false,
+        depthWrite: false,
+      }),
+    []
+  );
+
+  useEffect(() => {
+    let live = true;
+    
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+    
+    // Wider canvas to fit long titles (e.g. "Business Development Associate")
+    const canvasW = 1024;
+    const canvasH = 128;
+    canvas.width = canvasW;
+    canvas.height = canvasH;
+    
+    ctx.clearRect(0, 0, canvasW, canvasH);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    
+    const text = eyebrow.toUpperCase();
+    
+    // Start with a large font, scale down if it exceeds the canvas width
+    let fontSize = 64;
+    ctx.font = `300 ${fontSize}px 'Space Grotesk', system-ui, sans-serif`;
+    ctx.letterSpacing = "4px"; // Standard letter spacing
+
+    while (ctx.measureText(text).width > canvasW - 40 && fontSize > 20) {
+      fontSize -= 2;
+      ctx.font = `300 ${fontSize}px 'Space Grotesk', system-ui, sans-serif`;
+      // Reduce letter spacing slightly for very small fonts to save space
+      if (fontSize < 40) ctx.letterSpacing = "2px";
+    }
+    
+    ctx.fillText(text, canvasW / 2, canvasH / 2);
+    
+    const tex = new THREE.CanvasTexture(canvas);
+    // The canvas is power-of-two, so mipmaps keep the downscaled text
+    // smooth instead of crunchy when the card sits far from the camera.
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.anisotropy = gl.capabilities.getMaxAnisotropy();
+    tex.generateMipmaps = true;
+
+    if (!live) {
+      tex.dispose();
+      return;
+    }
+    
+    setTexture(tex);
+    material.map = tex;
+    material.needsUpdate = true;
+
+    return () => {
+      live = false;
+      tex.dispose();
+      material.dispose();
+    };
+  }, [eyebrow, gl, material]);
+
+  useFrame(() => {
+    if (!meshRef.current) return;
+    material.opacity = anim.opacity;
+    material.depthTest = parentMaterial.depthTest;
+  });
+
+  if (!texture) return null;
+
+  // Canvas aspect is 8:1 (1024x128). We can let it span the full width of the card.
+  const labelW = width * 0.95;
+  const labelH = labelW / 8;
+  const yOffset = height / 2 + labelH * 0.7;
+
+  return (
+    <mesh ref={meshRef} material={material} position={[0, yOffset, 0]}>
+      <planeGeometry args={[labelW, labelH]} />
+    </mesh>
+  );
+}

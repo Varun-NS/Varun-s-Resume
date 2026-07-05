@@ -1,10 +1,12 @@
 export interface ResumeCard {
   slug: string;
   title: string;
+  eyebrow?: string;
   subtitle: string;
   year: string;
   category: string[];
   image: string;
+  objectFit?: 'cover' | 'contain' | 'contain-dark';
   description: string;
 }
 

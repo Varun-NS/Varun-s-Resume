@@ -22,18 +22,6 @@
           "description": "I build products and run transformations at the intersection of operations, data and design. Eight years in, I still believe the best product decisions come from sitting next to the people who use the thing. This sphere is my career — every card is a chapter. Drag around, get lost, click anything."
         },
         {
-          "slug": "languages",
-          "title": "Languages",
-          "subtitle": "Human ones, not just SQL",
-          "year": "PROFILE",
-          "category": [
-            "PROFILE",
-            "COMMS"
-          ],
-          "image": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=900&auto=format&fit=crop",
-          "description": "English and Hindi professionally, Kannada natively. Comfortable presenting to a boardroom or debugging a requirement in the language the site team actually thinks in."
-        },
-        {
           "slug": "download-resume",
           "title": "Download Resume",
           "subtitle": "Get the PDF version",
@@ -44,6 +32,18 @@
           ],
           "image": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=900&auto=format&fit=crop",
           "description": "Click the button below to download a PDF copy of my traditional resume."
+        },
+        {
+          "slug": "languages",
+          "title": "Languages",
+          "subtitle": "Human ones, not just SQL",
+          "year": "PROFILE",
+          "category": [
+            "PROFILE",
+            "COMMS"
+          ],
+          "image": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=900&auto=format&fit=crop",
+          "description": "English and Hindi professionally, Kannada natively. Comfortable presenting to a boardroom or debugging a requirement in the language the site team actually thinks in."
         }
       ]
     },
@@ -51,20 +51,9 @@
       "title": "Work Experience",
       "cards": [
         {
-          "slug": "byjus",
-          "title": "Byju's",
-          "subtitle": "Business Development Associate",
-          "year": "Mar 2019 - Jun 2019",
-          "category": [
-            "EXPERIENCE",
-            "SALES"
-          ],
-          "image": "/byjus.png",
-          "description": "• Led customer acquisition initiatives by conducting product demonstrations and providing ongoing client support across Kolar, Tumkur, Mysore, and Chamarajanagar regions, fostering trust and enhancing the overall user experience.\n• Onboarded 22 clients, generating over 15 lakhs in revenue, and consistently ranked as one of the top 2 performers in the team.\n• Consistently exceeded sales targets on both a monthly and quarterly basis, driving business growth and contributing significantly to the team’s success.\n• Trained and mentored 3 interns, equipping them with effective product demonstration skills to drive team success.\n\n**Location:** Bangalore"
-        },
-        {
           "slug": "sodexo",
           "title": "Sodexo",
+          "eyebrow": "Product Innovation Lead",
           "subtitle": "Innovation Lead",
           "year": "Nov 2025 - Present",
           "category": [
@@ -77,6 +66,7 @@
         {
           "slug": "genpact",
           "title": "Genpact",
+          "eyebrow": "Lean Digital Transformation",
           "subtitle": "Assistant Manager - Lean Digital Transformation",
           "year": "Jun 2023 - Nov 2025",
           "category": [
@@ -89,6 +79,7 @@
         {
           "slug": "care-health",
           "title": "CARE Health",
+          "eyebrow": "International Business",
           "subtitle": "International Business (Market Research)",
           "year": "Apr 2022 - Jun 2022",
           "category": [
@@ -96,7 +87,22 @@
             "RESEARCH"
           ],
           "image": "/care_health.png",
+          "objectFit": "contain",
           "description": "• Conducted in-depth market research on the health insurance sector across Jordan, Qatar, Bahrain, Saudi Arabia, and Oman, providing actionable insights into potential growth opportunities for the company in these regions.\n• Presented comprehensive research findings and market analysis to the International Business Head, playing a key role in refining expansion strategies and narrowing down options to two strategic countries.\n• Analyzed health insurance plans from providers in Dubai, Abu Dhabi, and Fujairah, delivering strategic recommendations to enhance and optimize CHIL's offerings in the competitive market.\n\n**Location:** Gurgaon"
+        },
+        {
+          "slug": "byjus",
+          "title": "Byju's",
+          "eyebrow": "Business Development Associate",
+          "subtitle": "Business Development Associate",
+          "year": "Mar 2019 - Jun 2019",
+          "category": [
+            "EXPERIENCE",
+            "SALES"
+          ],
+          "image": "/byjus.png",
+          "objectFit": "contain",
+          "description": "• Led customer acquisition initiatives by conducting product demonstrations and providing ongoing client support across Kolar, Tumkur, Mysore, and Chamarajanagar regions, fostering trust and enhancing the overall user experience.\n• Onboarded 22 clients, generating over 15 lakhs in revenue, and consistently ranked as one of the top 2 performers in the team.\n• Consistently exceeded sales targets on both a monthly and quarterly basis, driving business growth and contributing significantly to the team’s success.\n• Trained and mentored 3 interns, equipping them with effective product demonstration skills to drive team success.\n\n**Location:** Bangalore"
         }
       ]
     },
@@ -105,19 +111,21 @@
       "cards": [
         {
           "slug": "mba",
-          "title": "MBA",
-          "subtitle": "PGDM(MBA), IMT Ghaziabad",
+          "title": "IMT Ghaziabad",
+          "eyebrow": "MBA",
+          "subtitle": "PGDM(MBA)",
           "year": "2021-2023",
           "category": [
-            "EDUCATION",
-            "STRATEGY"
+            "FINANCE",
+            "PRODUCT MANAGEMENT"
           ],
           "image": "/imt.jpg",
           "description": "Went back to school to put language and frameworks around what I'd learned on the floor — corporate strategy, finance, organisational behaviour. Left with a sharper sense of how decisions actually get made in large organisations."
         },
         {
           "slug": "engineering",
-          "title": "Engineering",
+          "title": "SJBIT Bangalore",
+          "eyebrow": "Engineering",
           "subtitle": "Bachelors of Engineering (Information Science)",
           "year": "2018",
           "category": [
@@ -125,7 +133,21 @@
             "FOUNDATION"
           ],
           "image": "/sjb.jpeg",
-          "description": "**Bachelors of Engineering (Information Science), SJBIT Bangalore.**\n\nAn engineering degree taught me to decompose problems, respect constraints, and distrust any answer that arrives too easily. It's why I can sit in an architecture review and hold my own — and why I never hand-wave feasibility."
+          "description": "Bachelors of Engineering"
+        },
+        {
+          "slug": "cat-exam",
+          "title": "CAT",
+          "eyebrow": "Common Admission Test",
+          "subtitle": "Score 97.77 (V ARC - 99.37% / DILR - 96.59%)",
+          "year": "2020",
+          "category": [
+            "EDUCATION",
+            "ACHIEVEMENT"
+          ],
+          "image": "/CAT.jpeg",
+          "objectFit": "contain",
+          "description": "Achieved a highly competitive score of 97.77 percentile in the Common Admission Test (CAT), with exceptional performance in Verbal Ability & Reading Comprehension (99.37%) and Data Interpretation & Logical Reasoning (96.59%)."
         }
       ]
     },
@@ -133,76 +155,53 @@
       "title": "Projects",
       "cards": [
         {
-          "slug": "projects",
-          "title": "Projects",
-          "subtitle": "Selected work & side quests",
-          "year": "INDEX",
-          "category": [
-            "WORK",
-            "PORTFOLIO"
-          ],
-          "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=900&auto=format&fit=crop",
-          "description": "A running index of shipped work — internal platforms, analytics products, automation pilots, and the occasional weekend experiment like the site you're standing inside right now."
+          "slug": "project-management-tool",
+          "title": "Collaborative Kanban Platform",
+          "subtitle": "Task tracking & collaboration",
+          "year": "2024",
+          "category": ["SOFTWARE", "PRODUCTIVITY"],
+          "image": "/project-management.png",
+          "objectFit": "contain-dark",
+          "description": "[https://kanban-app-peach.vercel.app/](https://kanban-app-peach.vercel.app/)\n\n**Collaborative Kanban Platform** is a modern project management application built to help teams organize work, collaborate in real time, and track project progress through an intuitive drag-and-drop interface.\n\nDeveloped using a **vibe-coding workflow**, the project demonstrates how AI-assisted development can accelerate delivery while maintaining a strong focus on software architecture, database design, security, and user experience.\n\nUsers can create multiple workspaces, invite collaborators, organize projects into customizable boards and lists, manage tasks with priorities and due dates, and monitor every project update through an automated activity timeline.\n\n### What I Built\n\nI designed and developed the complete application, focusing on creating a highly interactive frontend supported by a secure and scalable backend architecture.\n\n#### Rich Collaborative Experience\n\nThe platform enables teams to:\n\n* Create multiple workspaces and project boards\n* Invite members with role-based collaboration\n* Organize work using customizable Kanban lists\n* Drag and drop lists and task cards in real time\n* Track priorities, due dates, categories, and comments\n* View project activity through an automated audit timeline\n* Monitor project insights with interactive analytics\n\nThe goal was to build an experience that feels responsive, intuitive, and production-ready across desktop and mobile devices.\n\n#### Modern Full-Stack Architecture\n\nThe application is built using a contemporary web stack designed for scalability and maintainability.\n\n* **Frontend:** Next.js 16, React 19, TypeScript\n* **UI:** Tailwind CSS v4, shadcn/ui, Framer Motion\n* **Database:** PostgreSQL\n* **Backend Platform:** Supabase\n* **Charts & Analytics:** Recharts\n* **Date Management:** date-fns\n* **Drag & Drop:** @hello-pangea/dnd\n\n#### Secure Database Design\n\nOne of the most technically challenging aspects of the project was designing a secure multi-user collaboration model.\n\nThe platform uses a relational PostgreSQL schema to manage users, workspaces, memberships, boards, lists, cards, comments, and activity logs.\n\nTo enforce security at the database layer, I implemented advanced **PostgreSQL Row Level Security (RLS)** policies alongside custom SQL triggers. This ensures that every database query is automatically restricted based on ownership and team membership, preventing unauthorized access without relying solely on frontend validation.\n\n### Key Features\n\n* Real-time collaborative workspaces\n* Drag-and-drop Kanban boards\n* Nested task management\n* Team invitations and shared projects\n* Activity timeline and audit logging\n* Interactive project analytics\n* Secure Row Level Security (RLS)\n* Relational PostgreSQL database design\n* Fully responsive interface\n\n### Impact\n\nThis project showcases my ability to build complex, state-driven applications that combine a polished user experience with robust backend engineering.\n\nBeyond creating an intuitive Kanban workflow, the platform demonstrates expertise in scalable frontend architecture, relational database modeling, secure multi-tenant authorization, and production-style application design.\n\nDeveloping this project through a **vibe-coding workflow** reinforced that modern AI-assisted development is most effective when paired with thoughtful architecture, strong system design, and a clear understanding of real-world product requirements."
         },
         {
-          "slug": "digital-transformation",
-          "title": "Digital Transformation",
-          "subtitle": "From paper trails to platforms",
-          "year": "CRAFT",
-          "category": [
-            "STRATEGY",
-            "CHANGE"
-          ],
-          "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=900&auto=format&fit=crop",
-          "description": "Transformation isn't a software rollout — it's a behaviour change program with software attached. I run it as both: process mapping and tech selection on one track, champions, training and feedback loops on the other."
+          "slug": "india-tech-events-bot",
+          "title": "India Tech Events AI Platform",
+          "subtitle": "Automated event discovery",
+          "year": "2024",
+          "category": ["BOT", "AUTOMATION"],
+          "image": "/tech-events.png",
+          "objectFit": "contain-dark",
+          "description": "[https://india-tech-events-bot.vercel.app/](https://india-tech-events-bot.vercel.app/)\n\n**India Tech Events AI Platform** is an intelligent event discovery application that automatically aggregates technology conferences, meetups, hackathons, and expos happening across India.\n\nInstead of relying on manually curated event listings, the platform leverages AI to discover, extract, structure, and present event information through a modern, searchable dashboard. It also automates the distribution of personalized weekly email digests, ensuring users stay updated without actively searching for upcoming events.\n\nBuilt using a **vibe-coding workflow**, the project showcases how AI-assisted development can be combined with intelligent automation, modern web technologies, and LLM-powered data extraction to solve a real-world information aggregation problem.\n\n### What I Built\n\nI designed and developed the complete application—from the frontend dashboard to the AI-powered data extraction pipeline and automated newsletter system.\n\n#### AI-Powered Event Extraction\n\nTraditional web scraping often breaks when websites change their layouts.\n\nTo overcome this, the platform uses the **Serper API** to perform targeted Google searches for technology events across India. The search results are then processed by **Groq (Llama 3.3 70B)**, where carefully engineered prompts transform unstructured search snippets into structured event data containing:\n\n* Event name\n* Date\n* City\n* Category\n* Description\n* Registration links\n\nThis approach creates a far more flexible and maintainable event discovery pipeline compared to conventional HTML scraping.\n\n#### Interactive Dashboard\n\nThe frontend provides a clean and responsive experience that enables users to:\n\n* Browse upcoming technology events\n* Filter events by city, category, and month\n* Search events instantly\n* View live platform statistics\n* Explore events through a modern, mobile-friendly interface\n\n#### Automated Backend Workflow\n\nThe platform includes a serverless backend that periodically refreshes event data and powers the dashboard.\n\nA separate Node.js automation service generates beautifully formatted HTML newsletters and automatically sends curated weekly event summaries to subscribers, creating a complete end-to-end event discovery ecosystem.\n\n### Modern Tech Stack\n\n* **Frontend:** Next.js, React 19, TypeScript\n* **Styling:** Tailwind CSS v4, Framer Motion\n* **AI:** Groq (Llama 3.3 70B)\n* **Search Engine:** Serper API\n* **Backend:** Next.js Serverless API Routes\n* **Automation:** Node.js, Cron Jobs\n* **Email:** Nodemailer\n\n### Key Features\n\n* AI-powered event discovery\n* LLM-based information extraction\n* Automated event categorization\n* Intelligent search and filtering\n* Responsive dashboard\n* Serverless backend architecture\n* Weekly automated email newsletters\n* End-to-end data automation pipeline\n\n### Impact\n\nThis project demonstrates how Large Language Models can be used as intelligent information extraction engines rather than traditional chat interfaces.\n\nBy combining AI, search APIs, automation workflows, and modern web technologies, the platform transforms scattered web content into a structured, continuously updated event database with minimal manual intervention.\n\nThe project showcases practical applications of prompt engineering, AI orchestration, workflow automation, serverless architecture, and full-stack development to build a scalable, production-ready solution that delivers real value to technology professionals."
         },
         {
-          "slug": "applied-ai",
-          "title": "Applied AI",
-          "subtitle": "LLMs as product material",
-          "year": "2023–26",
-          "category": [
-            "AI",
-            "PRODUCT"
-          ],
-          "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=900&auto=format&fit=crop",
-          "description": "**I treat large language models as a design material, not magic.**\n\n• Shipped internal copilots for service and operations teams.\n• Built robust evaluation harnesses before scaling to production.\n• Learned where AI genuinely removes toil versus where it just relocates it."
-        },
-        {
-          "slug": "hackathon",
-          "title": "Hackathon Win",
-          "subtitle": "48 hours to a funded prototype",
+          "slug": "jaipur-travel-planner",
+          "title": "Jaipur — The Pink City",
+          "subtitle": "Curated itineraries",
           "year": "2023",
-          "category": [
-            "MILESTONE",
-            "AI"
-          ],
-          "image": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=900&auto=format&fit=crop",
-          "description": "Won an internal hackathon with an AI triage assistant for service requests. The demo earned a small budget, the pilot earned a real one, and the tool is still in use — proof that speed and rigour aren't opposites."
+          "category": ["TRAVEL", "APP"],
+          "image": "/jaipur.png",
+          "objectFit": "contain-dark",
+          "description": "[https://jaipur-royal-website.vercel.app/](https://jaipur-royal-website.vercel.app/)\n\n**Jaipur — The Pink City** is an immersive, cinematic travel platform that reimagines how users discover and plan a trip to one of India's most iconic heritage cities.\n\nRather than presenting static travel information, the platform combines rich storytelling, interactive exploration, real-time travel intelligence, AI assistance, and integrated booking capabilities into a premium digital experience.\n\nDeveloped using a **vibe-coding workflow**, the project demonstrates how modern AI-assisted development, performance-focused frontend engineering, and thoughtful product design can be combined to create a production-quality web application.\n\n### What I Built\n\nI designed and developed the complete user experience—from the cinematic landing page and interactive destination sections to the AI travel assistant, booking workflows, and live data integrations.\n\nThe objective was to create a platform that feels closer to an interactive documentary than a conventional tourism website.\n\n### Cinematic Storytelling Experience\n\nThe application delivers a premium browsing experience through carefully crafted animations, immersive layouts, and smooth page transitions.\n\nVisitors can explore Jaipur through dedicated sections covering:\n\n* Royal history and heritage\n* Iconic forts and palaces\n* Local cuisine\n* Culture and traditions\n* Festivals\n* Shopping destinations\n* Photography hotspots\n* Suggested itineraries\n* Travel recommendations\n\nInstead of overwhelming users with information, the platform guides them through an engaging visual narrative designed to inspire travel.\n\n### Intelligent Trip Planning\n\nBeyond showcasing Jaipur, the platform functions as a practical travel planner.\n\nUsers can:\n\n* Search and compare flights\n* Explore train options\n* Browse bus routes\n* Estimate travel budgets\n* Plan customized itineraries\n* Discover seasonal recommendations\n* Access live destination insights\n\nThese features transform the application from a content website into a comprehensive trip-planning platform.\n\n### AI Travel Assistant\n\nA built-in AI assistant helps visitors discover Jaipur more efficiently by answering travel-related questions and providing personalized recommendations.\n\nThe assistant is powered by **Groq (Llama 3)** and uses a custom topic-gating layer to ensure conversations remain focused on Jaipur travel. This creates a reliable experience while preventing unrelated or irrelevant responses.\n\nExample use cases include:\n\n* Building personalized itineraries\n* Suggesting attractions based on trip duration\n* Recommending local food\n* Planning family trips\n* Finding the best time to visit\n* Budget planning guidance\n\n### Live Travel Intelligence\n\nTo make the platform genuinely useful before and during a trip, it includes a **Live Pulse** dashboard that continuously presents destination information such as:\n\n* Current weather\n* Air Quality Index (AQI)\n* Seasonal travel insights\n* Environmental conditions\n\nReal-time environmental data is fetched through the **Open-Meteo API**, allowing visitors to make informed travel decisions.\n\n### Frontend Engineering\n\nThe project was built using a modern frontend architecture focused on performance, scalability, and user experience.\n\n#### Core Technologies\n\n* **Next.js 16 (App Router & Server Components)**\n* **React 19**\n* **TypeScript**\n* **Tailwind CSS**\n\n#### Animation & Motion\n\nCreating the cinematic feel required combining multiple animation technologies:\n\n* **GSAP** for advanced timeline animations\n* **Framer Motion** for interactive UI transitions\n* **Lenis** for ultra-smooth scrolling\n* Scroll-triggered animations\n* Progressive content reveals\n* Interactive section transitions\n\nThese technologies work together to create an experience that feels fluid and polished without compromising performance.\n\n### Maps & Geospatial Features\n\nInteractive maps were built using **Leaflet** and **React Leaflet**, enabling users to visualize attractions and explore Jaipur geographically.\n\nThe mapping experience complements the itinerary planner and helps visitors understand travel distances and locations more intuitively.\n\n### Search Engine Optimization\n\nThe application was engineered with discoverability in mind.\n\nTechnical SEO features include:\n\n* Structured JSON-LD metadata\n* Semantic HTML\n* Dynamic metadata generation\n* Optimized Open Graph tags\n* Fast page rendering through Server Components\n* Responsive layouts across devices\n\nThese optimizations improve search visibility while maintaining excellent loading performance.\n\n### Deployment & Performance\n\nThe application is deployed on **Vercel**, leveraging edge infrastructure to deliver fast global performance.\n\nSpecial attention was given to:\n\n* Optimized asset loading\n* Lazy-loaded components\n* Efficient image delivery\n* Minimal layout shift\n* Responsive design\n* Performance-first rendering strategies\n\nThe result is a highly immersive interface that remains smooth even with extensive animations and media-rich content.\n\n### Modern Tech Stack\n\n* **Frontend:** Next.js 16, React 19, TypeScript\n* **Styling:** Tailwind CSS\n* **Animations:** GSAP, Framer Motion, Lenis\n* **AI:** Groq SDK (Llama 3)\n* **Maps:** Leaflet, React Leaflet\n* **Weather:** Open-Meteo API\n* **Deployment:** Vercel\n\n### Key Features\n\n* Cinematic storytelling experience\n* Interactive travel planning\n* AI-powered Jaipur travel assistant\n* Flight, train, and bus booking widgets\n* Dynamic travel budget estimation\n* Live weather and AQI dashboard\n* Interactive destination maps\n* Mobile-first responsive interface\n* Performance-optimized architecture\n* SEO-first implementation\n* Edge deployment for fast global delivery\n\n### Impact\n\nJaipur — The Pink City demonstrates my ability to design and build modern digital products that combine immersive user experiences with practical functionality.\n\nBeyond creating a visually engaging website, the project showcases expertise in frontend architecture, animation systems, AI integration, real-time APIs, performance optimization, and SEO engineering.\n\nDeveloping this application through a **vibe-coding workflow** reinforced how AI-assisted development can accelerate implementation while allowing greater focus on product design, system architecture, user experience, and solving meaningful problems.\n\nThe result is a production-ready travel platform that blends storytelling, intelligent assistance, and interactive planning into a seamless digital experience."
         },
         {
-          "slug": "rpa",
-          "title": "RPA Programs",
-          "subtitle": "Bots for the boring parts",
-          "year": "2019–22",
-          "category": [
-            "PROCESS",
-            "TOOLING"
-          ],
-          "image": "https://images.unsplash.com/photo-1535378917042-10a22c95931a?q=80&w=900&auto=format&fit=crop",
-          "description": "Scoped and delivered robotic process automation for finance and operations back offices. Learned the hard lessons early: stabilise the process first, automate second, and monitor forever."
+          "slug": "stock-investment-planner",
+          "title": "FlowSphere",
+          "subtitle": "Portfolio analysis",
+          "year": "2023",
+          "category": ["FINANCE", "ANALYTICS"],
+          "image": "/stock-management.png",
+          "objectFit": "contain-dark",
+          "description": "[https://flowsphere-ai.vercel.app](https://flowsphere-ai.vercel.app)\n\n**FlowSphere** is a full-stack AI finance terminal that brings professional-grade market analysis, portfolio management, and intelligent stock screening to everyday investors through a single, unified platform.\n\nDesigned to bridge the gap between raw financial data and actionable insights, the platform enables users to analyze markets using natural language instead of complex screening tools. Users can track portfolios, maintain watchlists, perform technical analysis, visualize market trends, and receive AI-powered explanations that simplify even the most advanced market concepts.\n\nDeveloped using a **vibe-coding workflow**, the project demonstrates how AI-assisted development can be combined with robust software architecture, financial computation, and modern full-stack engineering to build production-ready financial products.\n\n### What I Built\n\nI designed and developed the complete platform—from the frontend user experience and backend services to the AI orchestration layer, market data pipeline, technical analysis engine, authentication, and caching architecture.\n\nThe platform allows users to:\n\n* Track and manage investment portfolios\n* Create personalized watchlists\n* Perform advanced technical stock analysis\n* Visualize historical market data through interactive charts\n* Screen stocks using conversational natural language\n* Receive AI-generated explanations of market conditions and technical indicators\n\nFor example, users can simply ask:\n\n> **\"Which large-cap IT stocks are trading below their 200-day moving average with a bullish MACD crossover?\"**\n\nFlowSphere interprets the request, performs the required financial analysis, and returns mathematically verified results alongside a concise AI-generated explanation.\n\n### Zero-Hallucination AI Architecture\n\nOne of the core design goals of FlowSphere was ensuring AI never invents financial figures or calculations.\n\nTo achieve this, I implemented a **Zero-Hallucination AI Architecture** based on strict separation of responsibilities between deterministic computation and language generation.\n\nThe workflow follows four stages:\n\n1. Natural language investment queries are converted into structured JSON filters.\n2. The backend performs all financial calculations, technical screening, and indicator computations.\n3. Verified numerical results are returned to the AI model.\n4. The LLM generates only the narrative explanation and investment insights.\n\nThis architecture ensures every price, indicator, and calculation originates from deterministic backend logic rather than AI-generated estimates, significantly improving reliability and user trust.\n\n### Financial Intelligence Engine\n\nThe backend performs comprehensive market analysis using real financial data and calculates indicators including:\n\n* Relative Strength Index (RSI)\n* Moving Average Convergence Divergence (MACD)\n* Bollinger Bands\n* Moving Averages\n* Price Momentum\n* Volume Analysis\n\nInstead of calculating financial metrics itself, the AI interprets verified results and explains market conditions in a way that is easy for investors to understand.\n\n### Resilient Market Data Pipeline\n\nTo maximize reliability and minimize dependency on a single provider, I designed a provider-agnostic market data architecture.\n\nMarket data flows through a multi-tier fallback pipeline:\n\n* Yahoo Finance API\n* Twelve Data API\n* Deterministic Local Mock Data\n\nIf a provider becomes unavailable or exceeds rate limits, requests automatically fail over to the next available source, ensuring uninterrupted application performance.\n\n### Performance & Caching\n\nBecause financial applications repeatedly access historical market datasets, I implemented an intelligent **Least Recently Used (LRU)** in-memory caching layer.\n\nThis significantly reduces redundant API calls, lowers external API costs, improves response times, and creates a faster user experience during repeated analysis.\n\n### Modern Full-Stack Architecture\n\nThe platform is built using a performance-first architecture optimized for scalability and responsiveness.\n\n#### Frontend\n\n* Next.js 15 (App Router)\n* React\n* TypeScript\n* Tailwind CSS\n* Framer Motion\n\nThe interface features a modern dark-themed dashboard designed for financial workflows while leveraging React Server Components and Suspense to reduce client-side JavaScript and improve loading performance.\n\n#### Data Visualization\n\nFinancial data is visualized using:\n\n* TradingView Lightweight Charts\n* Recharts\n\nThese libraries power responsive candlestick charts, technical indicator overlays, historical price analysis, and portfolio performance dashboards.\n\n#### Backend\n\nThe backend manages:\n\n* Technical stock screening\n* Financial calculations\n* AI orchestration\n* Market data retrieval\n* Portfolio management\n* Watchlists\n* User preferences\n\n#### Database\n\nPersistent application data is stored using **PostgreSQL** with **Prisma ORM**, managing:\n\n* User accounts\n* Watchlists\n* Portfolio data\n* Saved screeners\n* AI conversation history\n\n#### Authentication\n\nSecure user authentication and session management are implemented using **Clerk**, providing seamless onboarding and protected access to user data.\n\n### Modern Tech Stack\n\n* **Frontend:** Next.js 15, React, TypeScript\n* **Styling:** Tailwind CSS, Framer Motion\n* **AI:** Groq SDK (Llama 3.3 70B)\n* **Charts:** TradingView Lightweight Charts, Recharts\n* **Backend:** Next.js API Routes, Node.js\n* **Database:** PostgreSQL, Prisma ORM\n* **Authentication:** Clerk\n* **Market Data:** Yahoo Finance API, Twelve Data API\n* **Caching:** In-Memory LRU Cache\n\n### Key Features\n\n* AI-powered stock screener\n* Natural language investment queries\n* Portfolio management\n* Personalized watchlists\n* Interactive financial charts\n* Technical indicator analysis\n* AI-powered market explanations\n* Zero-hallucination AI architecture\n* Multi-provider market data pipeline\n* Intelligent caching layer\n* Secure authentication\n* Responsive dashboard\n\n### Impact\n\nFlowSphere demonstrates how Large Language Models can be integrated into financial products without compromising numerical accuracy or user trust.\n\nRather than relying on AI to generate financial data, the platform combines deterministic computation with conversational AI, ensuring all market calculations are mathematically verified while making complex investment concepts easier to understand.\n\nThe project showcases expertise in AI system architecture, prompt engineering, financial analytics, full-stack engineering, caching strategies, data visualization, authentication, and performance optimization.\n\nDeveloping the platform through a **vibe-coding workflow** reinforced that AI-assisted development is most effective when combined with thoughtful system design, rigorous engineering principles, and a strong focus on delivering practical value to end users.\n\nThe result is a production-ready AI finance terminal that empowers retail investors with intelligent market analysis, reliable financial insights, and an intuitive investment research experience."
         },
         {
-          "slug": "this-website",
-          "title": "This Website",
-          "subtitle": "A resume you can stand inside",
-          "year": "2026",
-          "category": [
-            "PROJECT",
-            "CRAFT"
-          ],
-          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=900&auto=format&fit=crop",
-          "description": "Built with Next.js, React Three Fiber and GSAP — a spherical gallery with custom inertial camera controls, canvas-generated card textures, and handcrafted transitions. Yes, it's over-engineered. That's the point."
+          "slug": "menu-ai",
+          "title": "Smart Catering AI",
+          "subtitle": "Smart restaurant menus",
+          "year": "2025",
+          "category": ["AI", "HOSPITALITY"],
+          "image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=900&auto=format&fit=crop",
+          "description": "[https://smart-catering.vercel.app/](https://smart-catering.vercel.app/)\n\n**Smart Catering AI** is an AI-powered platform that helps corporate catering teams generate structured, nutritionally balanced menus in seconds instead of hours.\n\nDeveloped using a **vibe-coding workflow** with modern AI development tools, the project demonstrates how rapid AI-assisted development can be combined with solid software architecture to build production-ready business applications.\n\nThe platform allows catering teams to upload historical menu data and instantly generate new daily menus based on client preferences, meal type, cost per plate, protein requirements, and operational constraints.\n\nInstead of relying on purely generative AI, Smart Catering AI uses a **Hybrid Retrieval-Augmented Generation (RAG)** approach that balances familiarity with innovation.\n\n* **30–40% Existing Recipes** retrieved directly from historical menus\n* **30–40% Modified Recipes** intelligently adapted from previous dishes\n* **20–30% Completely New Recipes** created through AI-driven culinary exploration\n\nThis ensures every generated menu feels both reliable and refreshingly new while maintaining brand consistency.\n\n### What I Built\n\nI designed and developed the complete application architecture, including the frontend experience, backend services, AI orchestration, retrieval pipeline, and export workflows.\n\n#### Intelligent Retrieval\n\nHistorical menu data uploaded through Excel or CSV files is transformed into vector embeddings and indexed using **ChromaDB**. During generation, the system retrieves the most relevant historical recipes and injects them into the AI context, significantly improving factual grounding and reducing hallucinations.\n\n#### Dual AI Engine\n\nThe application primarily uses **Gemini 1.5 Flash** for high-speed generation and large-context reasoning.\n\nTo improve reliability, I implemented an automatic failover mechanism that seamlessly switches to **Groq (Llama 3.3 70B)** whenever Gemini encounters rate limits or temporary failures, ensuring uninterrupted menu generation.\n\n#### Modern Full-Stack Architecture\n\nThe platform is built with a modern technology stack:\n\n* **Frontend:** Next.js 16, React, Tailwind CSS, Framer Motion\n* **Backend:** FastAPI, Python, SQLAlchemy\n* **Database:** SQLite\n* **Vector Database:** ChromaDB\n* **AI Models:** Gemini 1.5 Flash + Groq (Llama 3.3 70B)\n* **Exports:** PDF and Excel generation for kitchen and procurement workflows\n\n### Key Features\n\n* AI-powered menu generation\n* Retrieval-Augmented Generation (RAG)\n* Vector similarity search\n* Intelligent recipe variation engine\n* Enterprise-grade prompt engineering\n* Automatic AI model failover\n* Responsive mobile-first interface\n* PDF & Excel export pipeline\n* Menu history and audit logging\n\n### Impact\n\nSmart Catering AI transforms a traditionally manual planning process into an intelligent decision-support system for enterprise catering operations.\n\nBeyond generating menus, the project showcases practical applications of modern AI engineering—including Retrieval-Augmented Generation, vector search, resilient multi-model orchestration, prompt engineering, and production-style backend architecture—to solve a real business problem.\n\nThis project reflects my interest in building AI-powered products that combine business value, thoughtful user experience, and scalable system design."
         }
       ]
     },
@@ -210,16 +209,59 @@
       "title": "Certifications",
       "cards": [
         {
-          "slug": "certifications",
-          "title": "Certifications",
-          "subtitle": "CSPO · SQL · Generative AI",
-          "year": "2019–25",
-          "category": [
-            "EDUCATION",
-            "PROOF"
-          ],
-          "image": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=900&auto=format&fit=crop",
-          "description": "Certified Scrum Product Owner, advanced SQL for data analysis, and recent certifications in generative AI for product teams. I collect credentials the way I collect tools — only when I intend to use them."
+          "slug": "hbs-strategy",
+          "title": "Strategy Execution",
+          "eyebrow": "Harvard Business School",
+          "subtitle": "Business Strategy",
+          "year": "2024",
+          "category": ["CERTIFICATION"],
+          "image": "/hbs.png",
+          "objectFit": "contain",
+          "description": "Mastered the frameworks and tools required to successfully execute strategy, including performance measurement, aligning organizational architecture, and managing innovation."
+        },
+        {
+          "slug": "mckinsey-forward",
+          "title": "Forward Program",
+          "eyebrow": "McKinsey",
+          "subtitle": "Leadership & Strategy",
+          "year": "2023",
+          "category": ["CERTIFICATION"],
+          "image": "/mckinsey.png",
+          "objectFit": "contain",
+          "description": "Completed the McKinsey Forward Program, focusing on practical skills for the future of work, including leadership, business strategy, and navigating complex problem-solving in a digital world."
+        },
+        {
+          "slug": "nextleap-pm",
+          "title": "Product Management",
+          "eyebrow": "Next Leap",
+          "subtitle": "Product Strategy",
+          "year": "2023",
+          "category": ["CERTIFICATION"],
+          "image": "/nextleap.webp",
+          "objectFit": "contain",
+          "description": "Graduated from the intensive Next Leap Product Management program, learning modern product discovery, roadmap planning, and execution frameworks from industry experts."
+        },
+        {
+          "slug": "insurjo-22",
+          "title": "Insurjo 22",
+          "eyebrow": "The Product Folks",
+          "subtitle": "Product Management",
+          "year": "2022",
+          "category": ["CERTIFICATION"],
+          "image": "/productfolks.png",
+          "objectFit": "contain",
+          "description": "Participated in Insurjo 22, the ultimate playbook for aspiring Product Managers. Explored user psychology, GTM strategies, and product analytics alongside a community of PMs."
+        },
+        {
+          "slug": "forevision-python",
+          "title": "Python for Finance",
+          "eyebrow": "ForeVision",
+          "subtitle": "Financial Modeling",
+          "year": "2022",
+          "category": ["CERTIFICATION"],
+          "image": "/forevision.png",
+          "objectFit": "contain",
+          "description": "Gained proficiency in utilizing Python for financial modeling, data analysis, and developing algorithmic solutions to streamline complex financial operations."
         }
       ]
     },
@@ -297,23 +339,6 @@
           ],
           "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=900&auto=format&fit=crop",
           "description": "Implementing lean methodologies such as PSR, Daily Management, Value Stream Mapping (VSM), Value Generation Roadmap (VGR), and FMEA to identify critical pain points."
-        }
-      ]
-    },
-    {
-      "title": "Hobbies",
-      "cards": [
-        {
-          "slug": "volunteering",
-          "title": "Volunteering",
-          "subtitle": "Skills, donated",
-          "year": "ONGOING",
-          "category": [
-            "COMMUNITY",
-            "PEOPLE"
-          ],
-          "image": "https://images.unsplash.com/photo-1559027615-cd4628902d4a?q=80&w=900&auto=format&fit=crop",
-          "description": "Digital-literacy workshops and pro-bono analytics for local non-profits. Working with tiny budgets and huge constraints is the purest product training there is."
         }
       ]
     },

@@ -1,8 +1,9 @@
 /**
- * Synthesized sound design for the room — no audio assets, everything is
- * generated with the Web Audio API and tuned around A so the palette feels
- * composed: a near-subliminal ambient pad, a wind bed that follows the
- * camera's momentum, and tiny percussive confirmations for hover/click.
+ * Sound design for the room, built the way phantom.land builds theirs:
+ * five produced samples (load / whoosh / swipe / riser / click, served from
+ * /public/sounds) played through a WebAudio graph with a synthesized
+ * convolver reverb. The shared reverb tail is what melts the one-shots
+ * into one continuous, polished space instead of separate sound effects.
  *
  * The context is created lazily on the first user gesture (autoplay policy)
  * and the whole mix runs through one master gain so mute is a single ramp.
@@ -10,15 +11,24 @@
 
 const STORAGE_KEY = "resume-sound";
 
+const SAMPLE_URLS = {
+  load: "/sounds/load.mp3",
+  whoosh: "/sounds/whoosh.mp3",
+  swipe: "/sounds/swipe.mp3",
+  riser: "/sounds/riser.mp3",
+  click: "/sounds/click.mp3",
+} as const;
+
+type SampleName = keyof typeof SAMPLE_URLS;
 type Sub = () => void;
 
 class AudioEngine {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
-  private ambient: GainNode | null = null;
-  private windGain: GainNode | null = null;
-  private windFilter: BiquadFilterNode | null = null;
-  private lastBlip = 0;
+  private reverb: ConvolverNode | null = null;
+  private buffers: Partial<Record<SampleName, AudioBuffer>> = {};
+  private lastWhoosh = 0;
+  private lastClick = 0;
   private subs = new Set<Sub>();
 
   muted = false;
@@ -47,8 +57,15 @@ class AudioEngine {
     this.master.connect(limiter);
     limiter.connect(ctx.destination);
 
-    this.buildAmbient(ctx, this.master);
-    this.buildWind(ctx, this.master);
+    // One shared reverb, fed per-voice through send gains.
+    this.reverb = ctx.createConvolver();
+    this.reverb.buffer = this.impulse(ctx, 2.6, 2.4);
+    const reverbReturn = ctx.createGain();
+    reverbReturn.gain.value = 0.55;
+    this.reverb.connect(reverbReturn);
+    reverbReturn.connect(this.master);
+
+    void this.loadSamples(ctx);
 
     if (!this.muted) {
       // The room fades in like the lights coming up — never a hard start.
@@ -78,129 +95,154 @@ class AudioEngine {
     this.emit();
   }
 
-  // ---- Beds -----------------------------------------------------------
+  // ---- Sample infrastructure -------------------------------------------
 
-  /** Low A pad: three detuned partials under a slowly breathing lowpass. */
-  private buildAmbient(ctx: AudioContext, out: GainNode): void {
-    const pad = ctx.createGain();
-    pad.gain.value = 0.05;
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 220;
-    filter.Q.value = 0.4;
-    pad.connect(filter);
-    filter.connect(out);
-    this.ambient = pad;
+  private async loadSamples(ctx: AudioContext): Promise<void> {
+    await Promise.all(
+      (Object.keys(SAMPLE_URLS) as SampleName[]).map(async (name) => {
+        try {
+          const res = await fetch(SAMPLE_URLS[name]);
+          const data = await res.arrayBuffer();
+          this.buffers[name] = await ctx.decodeAudioData(data);
+        } catch {
+          // Sound is a nicety — a missing sample just stays silent.
+        }
+      })
+    );
+    this.startBed();
+  }
 
-    const partials: Array<[OscillatorType, number, number]> = [
-      ["sine", 55, 0.5], // A1
-      ["sine", 110.4, 0.3], // A2, a hair sharp for slow beating
-      ["triangle", 164.8, 0.12], // E3
-    ];
-    for (const [type, freq, level] of partials) {
-      const osc = ctx.createOscillator();
-      osc.type = type;
-      osc.frequency.value = freq;
-      const g = ctx.createGain();
-      g.gain.value = level;
-      osc.connect(g);
-      g.connect(pad);
-      osc.start();
+  /** Exponentially decaying stereo noise — a synthesized room impulse. */
+  private impulse(ctx: AudioContext, seconds: number, decay: number): AudioBuffer {
+    const len = Math.floor(ctx.sampleRate * seconds);
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i = 0; i < len; i++)
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
     }
-
-    // One slow LFO breathes the filter so the pad never reads as a test tone.
-    const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.045;
-    const lfoAmt = ctx.createGain();
-    lfoAmt.gain.value = 70;
-    lfo.connect(lfoAmt);
-    lfoAmt.connect(filter.frequency);
-    lfo.start();
+    return buf;
   }
 
-  private noiseBuffer(ctx: AudioContext): AudioBuffer {
-    const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-    return buffer;
-  }
-
-  /** Filtered noise bed, silent until the camera moves. */
-  private buildWind(ctx: AudioContext, out: GainNode): void {
-    const src = ctx.createBufferSource();
-    src.buffer = this.noiseBuffer(ctx);
-    src.loop = true;
-    const filter = ctx.createBiquadFilter();
-    filter.type = "bandpass";
-    filter.frequency.value = 260;
-    filter.Q.value = 0.7;
-    const gain = ctx.createGain();
-    gain.gain.value = 0;
-    src.connect(filter);
-    filter.connect(gain);
-    gain.connect(out);
-    src.start();
-    this.windGain = gain;
-    this.windFilter = filter;
-  }
-
-  /** Drive from the render loop with 0..1 camera energy. */
-  setWind(energy: number): void {
-    if (!this.ctx || !this.windGain || !this.windFilter) return;
-    const t = this.ctx.currentTime;
-    const v = Math.min(1, Math.max(0, energy));
-    this.windGain.gain.setTargetAtTime(v * 0.055, t, 0.1);
-    this.windFilter.frequency.setTargetAtTime(240 + v * 640, t, 0.15);
-  }
-
-  // ---- One-shots --------------------------------------------------------
-
-  private blip(
-    freq: number,
-    opts: { gain?: number; decay?: number; glideTo?: number; type?: OscillatorType } = {}
+  private play(
+    name: SampleName,
+    opts: {
+      gain?: number;
+      rate?: number;
+      send?: number;
+      loop?: boolean;
+      loopStart?: number;
+      lowpass?: number;
+    } = {}
   ): void {
-    if (!this.ctx || !this.master || this.muted) return;
-    const { gain = 0.05, decay = 0.15, glideTo, type = "sine" } = opts;
-    const ctx = this.ctx;
-    const t = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, t);
-    if (glideTo) osc.frequency.exponentialRampToValueAtTime(glideTo, t + decay);
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(gain, t + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
-    osc.connect(g);
-    g.connect(this.master);
-    osc.start(t);
-    osc.stop(t + decay + 0.05);
+    const buf = this.buffers[name];
+    if (!this.ctx || !this.master || !buf) return;
+    const { gain = 0.5, rate = 1, send = 0.6, loop = false, loopStart = 0, lowpass } = opts;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    src.playbackRate.value = rate;
+    if (loop) {
+      src.loop = true;
+      src.loopStart = loopStart;
+      src.loopEnd = buf.duration;
+    }
+    const g = this.ctx.createGain();
+    g.gain.value = gain;
+    src.connect(g);
+    let tail: AudioNode = g;
+    if (lowpass) {
+      const lp = this.ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.value = lowpass;
+      lp.Q.value = 0.5;
+      g.connect(lp);
+      tail = lp;
+    }
+    tail.connect(this.master);
+    if (send > 0 && this.reverb) {
+      const s = this.ctx.createGain();
+      s.gain.value = send;
+      tail.connect(s);
+      s.connect(this.reverb);
+    }
+    src.start();
   }
 
-  /** Card hover — a tiny high tick, rate-limited, humanised with detune. */
-  hover(): void {
-    const now = performance.now();
-    if (now - this.lastBlip < 90) return;
-    this.lastBlip = now;
-    this.blip(880 * Math.pow(2, (Math.random() * 40 - 20) / 1200), {
-      gain: 0.028,
-      decay: 0.09,
+  // ---- Beds -------------------------------------------------------------
+
+  /**
+   * The load rumble becomes the room's idle bed: the first pass plays its
+   * intro transient (the "power on"), then it loops only the rumble body.
+   * The lowpass strips the sample's faint ~1.3kHz tonal line, which reads
+   * as a constant bell when looped — only the deep rumble survives.
+   */
+  private startBed(): void {
+    this.play("load", {
+      gain: 0.7,
+      send: 0.9,
+      loop: true,
+      loopStart: 1.0,
+      lowpass: 260,
     });
   }
 
-  /** Nav tick — quieter, lower. */
+  /**
+   * Drive from the render loop with 0..1 pointer/camera energy. Fast
+   * movement retriggers the whoosh sample — pitch and level ride the
+   * energy, and the shared reverb smears retriggers into one motion.
+   */
+  setWarp(energy: number): void {
+    if (!this.ctx || this.muted) return;
+    const v = Math.min(1, Math.max(0, energy));
+    const now = performance.now();
+    if (v > 0.3 && now - this.lastWhoosh > 1400) {
+      this.lastWhoosh = now;
+      this.play("whoosh", {
+        gain: 0.25 + v * 0.45,
+        rate: 0.85 + v * 0.3 + Math.random() * 0.08,
+        send: 0.7,
+      });
+    }
+  }
+
+  // ---- One-shots ----------------------------------------------------------
+
+  /** A hard drag-and-release throw — the long echoing swipe tail. */
+  swipe(intensity: number): void {
+    const v = Math.min(1, Math.max(0, intensity));
+    if (this.muted) return;
+    this.play("swipe", { gain: 0.2 + v * 0.35, rate: 0.95 + v * 0.15, send: 0.6 });
+  }
+
+  /** Card hover — the click sample, tiny and up-pitched, rate-limited. */
+  hover(): void {
+    if (this.muted) return;
+    const now = performance.now();
+    if (now - this.lastClick < 90) return;
+    this.lastClick = now;
+    this.play("click", {
+      gain: 0.12,
+      rate: 1.15 + Math.random() * 0.1,
+      send: 0.35,
+    });
+  }
+
+  /** Nav tick — the click at its natural pitch. */
   tick(): void {
-    this.blip(660, { gain: 0.03, decay: 0.08 });
+    if (this.muted) return;
+    this.play("click", { gain: 0.22, rate: 1, send: 0.4 });
   }
 
-  /** Card opens — rising fifth, like a door swinging in. */
+  /** Card opens — the riser, a swell into the detail view. */
   open(): void {
-    this.blip(330, { gain: 0.06, decay: 0.5, glideTo: 660 });
+    if (this.muted) return;
+    this.play("riser", { gain: 0.4, rate: 1, send: 0.65 });
   }
 
-  /** Back to the gallery — the same door, closing. */
+  /** Back to the gallery — a low, slow whoosh out. */
   close(): void {
-    this.blip(560, { gain: 0.05, decay: 0.4, glideTo: 300 });
+    if (this.muted) return;
+    this.play("whoosh", { gain: 0.3, rate: 0.75, send: 0.7 });
   }
 }
 

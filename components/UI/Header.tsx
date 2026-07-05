@@ -25,7 +25,7 @@ function SoundToggle() {
         audio.setMuted(!muted);
         if (muted) audio.tick(); // audible confirmation only when unmuting
       }}
-      className="pointer-events-auto font-mono text-[11px] uppercase tracking-[0.18em] text-smoke opacity-0 transition-colors duration-200 hover:text-fog"
+      className="pointer-events-auto font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog opacity-0 transition-colors duration-200 hover:text-white"
       aria-pressed={!muted}
       aria-label={muted ? "Turn sound on" : "Turn sound off"}
     >
@@ -87,21 +87,45 @@ export function Header() {
     >
       <header className="flex items-start justify-between">
         <div data-chrome className="opacity-0">
-          <p className="text-sm font-medium tracking-wide text-fog">
+          <p className="text-base font-bold tracking-wide text-white">
             {data.profile.name}
           </p>
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-smoke">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog">
             {data.profile.role}
           </p>
         </div>
-        <div className="flex items-start gap-6">
+        <div className="flex items-center gap-5 sm:gap-6">
           <SoundToggle />
           <a
             data-chrome
             href={`mailto:${data.profile.email}`}
-            className="pointer-events-auto font-mono text-[11px] uppercase tracking-[0.18em] text-smoke opacity-0 transition-colors duration-200 hover:text-fog"
+            className="pointer-events-auto hidden font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog opacity-0 transition-colors duration-200 hover:text-white sm:inline"
           >
             {data.profile.email}
+          </a>
+          <a
+            data-chrome
+            href="/resume.pdf"
+            download
+            onClick={() => audio.tick()}
+            className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/30 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white opacity-0 transition-colors duration-200 hover:border-white/60 hover:bg-white/10"
+          >
+            Resume
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M8 2.5v8m0 0L4.8 7.3M8 10.5l3.2-3.2M3 12.5h10"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </a>
         </div>
       </header>
@@ -110,15 +134,9 @@ export function Header() {
         <p
           data-chrome
           ref={hintRef}
-          className="font-mono text-[11px] uppercase tracking-[0.22em] text-smoke opacity-0"
+          className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-fog opacity-0"
         >
           Drag to look around · Click a card to open
-        </p>
-        <p
-          data-chrome
-          className="font-mono text-[11px] uppercase tracking-[0.18em] text-smoke opacity-0"
-        >
-          {data.sections.reduce((acc, s) => acc + s.cards.length, 0)} cards
         </p>
       </footer>
     </div>

@@ -159,7 +159,13 @@ export function DetailView({ card }: { card: ResumeCard }) {
             <img
               src={card.image}
               alt={card.title}
-              className="h-[46vh] w-full object-cover sm:h-[52vh]"
+              className={`h-[46vh] w-full sm:h-[52vh] ${
+                card.objectFit === 'contain' 
+                  ? 'object-contain bg-white p-8' 
+                  : card.objectFit === 'contain-dark'
+                  ? 'object-contain bg-[#0a0a0b] p-8'
+                  : 'object-cover'
+              }`}
             />
           </div>
 
@@ -177,9 +183,17 @@ export function DetailView({ card }: { card: ResumeCard }) {
             </span>
           </div>
 
+          {card.eyebrow && (
+            <h2 
+              data-detail 
+              className="mt-6 mb-2 text-xl font-light uppercase tracking-[0.2em] text-white/40 font-mono"
+            >
+              {card.eyebrow}
+            </h2>
+          )}
           <h1
             data-detail
-            className="mt-6 text-4xl font-semibold tracking-tight text-fog sm:text-6xl"
+            className={`${card.eyebrow ? 'mt-1' : 'mt-6'} text-4xl font-semibold tracking-tight text-fog sm:text-6xl`}
           >
             {card.title}
           </h1>

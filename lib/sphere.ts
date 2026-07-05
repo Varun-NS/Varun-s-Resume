@@ -73,14 +73,17 @@ export function buildPlacements(
   const placements: CardPlacement[] = [];
   const sectionPlacements: SectionPlacement[] = [];
 
-  // Increased spacing angles to accommodate larger cards
-  const cardWidthAngle = 0.36;
-  const cardHeightAngle = 0.45;
+  // Grid rhythm: a card spans ~0.23 rad vertically and ~0.17 rad in yaw, so
+  // these steps leave a gap of roughly 40% of a card between neighbours —
+  // tight enough to read as one grid, loose enough for the eyebrow labels.
+  const cardWidthAngle = 0.26;
+  const cardHeightAngle = 0.34;
 
-  // Latitudinal separation of ~45 degrees (0.8 rad)
-  const pitchTop = 0.8;
+  // Latitude of the upper/lower bands (~39°): high enough to clear the
+  // equator rows, low enough that cards there don't roll on screen.
+  const pitchTop = 0.68;
   const pitchMid = 0.0;
-  const pitchBottom = -0.8;
+  const pitchBottom = -0.68;
 
   // Grid per section, capped at 2 rows: rows stacked toward a pole converge
   // and overlap, so big sections grow sideways instead of upward.
@@ -149,7 +152,7 @@ export function buildPlacements(
     // Label goes above the top row — close enough to stay inside the FOV
     // when the camera frames the section.
     const topRowPitchOffset = ((rows - 1) / 2) * cardHeightAngle;
-    const labelPitch = sector.pitch + topRowPitchOffset + 0.28;
+    const labelPitch = sector.pitch + topRowPitchOffset + 0.2;
     const labelEuler = new THREE.Euler(labelPitch, sector.yaw, 0, "YXZ");
     const labelVec = new THREE.Vector3(0, 0, -radius).applyEuler(labelEuler);
 
@@ -163,7 +166,7 @@ export function buildPlacements(
     );
 
     // Panel angular size (with generous 8-12% padding)
-    const paddingAngle = 0.25;
+    const paddingAngle = 0.2;
     const panelWidthAngle = Math.max(1, cols - 1) * widestRowStep + 2 * paddingAngle;
     // Extra top padding for the label and larger cards
     const panelHeightAngle = Math.max(1, rows - 1) * cardHeightAngle + 2 * paddingAngle + 0.35;
@@ -185,7 +188,8 @@ export function buildPlacements(
 
       const localPitch = - (r - (rows - 1) / 2) * cardHeightAngle;
       const cardPitch = sector.pitch + localPitch;
-      const localYaw = (c - (itemsInRow - 1) / 2) * rowYawStep(cardPitch);
+      // Invert yaw calculation: c=0 should be left (+yaw), higher c should move right (-yaw)
+      const localYaw = ((itemsInRow - 1) / 2 - c) * rowYawStep(cardPitch);
       const cardYaw = sector.yaw + localYaw;
       const euler = new THREE.Euler(cardPitch, cardYaw, 0, "YXZ");
       const vec = new THREE.Vector3(0, 0, -radius).applyEuler(euler);

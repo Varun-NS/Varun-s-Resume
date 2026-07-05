@@ -248,8 +248,8 @@ export function Gallery() {
         tl.to(
           h.anim,
           {
-            opacity: dimmed ? 0.12 : 1,
-            brightness: dimmed ? 0.45 : 1,
+            opacity: dimmed ? 0.08 : 1,
+            brightness: dimmed ? 0.35 : 1,
             scale: dimmed ? 0.97 : 1,
             floatAmp: 1,
             duration: d,
@@ -288,8 +288,9 @@ export function Gallery() {
       if (dimmed) {
         // Spotlight: everything outside the framed section recedes into
         // the dark so neighbours at the frame's edge don't compete.
-        brightness = 0.45;
-        opacity = 0.12;
+        // Low enough that even white logo cards stay ghosts.
+        brightness = 0.35;
+        opacity = 0.08;
         scale = 0.97;
         if (hovered && h.slug === hovered.slug) {
           // Still discoverable under the cursor.
@@ -360,7 +361,9 @@ export function Gallery() {
       
     gsap.to(cameraState, {
       targetYaw: yawGoal,
-      targetPitch: section.pitch,
+      // Aim a touch above the grid centre so the floating section title and
+      // the bottom nav bar both get breathing room in the frame.
+      targetPitch: section.pitch + 0.05,
       zOffset: targetZOffset,
       drift: 0, // hold the framing still — no idle slide while reading a section
       duration: reduced ? 0.4 : 2.2, // increased duration for majestic pan

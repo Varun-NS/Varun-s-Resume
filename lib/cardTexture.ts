@@ -87,6 +87,21 @@ function drawCover(
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 }
 
+/** Contain-fit an image into a rect, showing the whole image with letterboxing. */
+function drawContain(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  x: number,
+  y: number,
+  w: number,
+  h: number
+): void {
+  const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+  const dw = img.naturalWidth * scale;
+  const dh = img.naturalHeight * scale;
+  ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+}
+
 /** Deterministic hue per card so fallback gradients feel intentional. */
 function fallbackGradient(
   ctx: CanvasRenderingContext2D,
@@ -98,13 +113,13 @@ function fallbackGradient(
 ): void {
   let hash = 0;
   for (let i = 0; i < seedText.length; i++) {
-    hash = (hash * 31 + seedText.charCodeAt(i)) | 0;
+    hash = seedText.charCodeAt(i) + ((hash << 5) - hash);
   }
   const hue = Math.abs(hash) % 360;
-  const g = ctx.createLinearGradient(x, y, x + w, y + h);
-  g.addColorStop(0, `hsl(${hue}, 28%, 16%)`);
-  g.addColorStop(1, `hsl(${(hue + 40) % 360}, 32%, 7%)`);
-  ctx.fillStyle = g;
+  const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+  grad.addColorStop(0, `hsl(${hue}, 10%, 15%)`);
+  grad.addColorStop(1, `hsl(${(hue + 40) % 360}, 15%, 8%)`);
+  ctx.fillStyle = grad;
   ctx.fillRect(x, y, w, h);
 }
 
@@ -120,6 +135,7 @@ export async function createCardTexture(
 
   const w = TEX_WIDTH;
   const h = Math.round(TEX_WIDTH / aspect);
+
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
@@ -163,14 +179,29 @@ export async function createCardTexture(
   const imgH = imgBottom - imgTop;
 
   ctx.save();
-  roundedPath(ctx, imgX, imgTop, imgW, imgH, 16);
-  ctx.clip();
+  
   if (img) {
-    drawCover(ctx, img, imgX, imgTop, imgW, imgH);
-    // Gentle darkening keeps white photos from blowing out the dark room.
-    ctx.fillStyle = "rgba(5,5,5,0.14)";
-    ctx.fillRect(imgX, imgTop, imgW, imgH);
+    if (card.objectFit === 'contain' || card.objectFit === 'contain-dark') {
+        // For contain, we don't clip tightly because we might want a background color 
+        // to fill the letterboxing. Let's fill the background with white since logos often need it.
+        roundedPath(ctx, imgX, imgTop, imgW, imgH, 16);
+        if (card.objectFit === 'contain') {
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+        }
+        ctx.clip();
+        drawContain(ctx, img, imgX, imgTop, imgW, imgH);
+    } else {
+        roundedPath(ctx, imgX, imgTop, imgW, imgH, 16);
+        ctx.clip();
+        drawCover(ctx, img, imgX, imgTop, imgW, imgH);
+        // Gentle darkening keeps white photos from blowing out the dark room.
+        ctx.fillStyle = "rgba(5,5,5,0.14)";
+        ctx.fillRect(imgX, imgTop, imgW, imgH);
+    }
   } else {
+    roundedPath(ctx, imgX, imgTop, imgW, imgH, 16);
+    ctx.clip();
     fallbackGradient(ctx, imgX, imgTop, imgW, imgH, card.slug);
   }
   ctx.restore();
