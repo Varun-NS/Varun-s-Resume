@@ -1,13 +1,17 @@
 import * as THREE from "three";
 import type { ResumeCard } from "./types";
+import { themes, type ThemeName } from "./theme";
 
 /**
  * Each gallery card is a single canvas-composed texture: frame, image,
- * title, year and category chips are all baked into one bitmap so a card
+ * category, date and title are all baked into one bitmap so a card
  * costs exactly one draw call in the scene.
  */
 
-const TEX_WIDTH = 640;
+// 1024px keeps titles crisp at reading distance on desktop; phones get a
+// lighter bake (44 cards × RGBA + mips adds up in GPU memory).
+const TEX_WIDTH =
+  typeof window !== "undefined" && window.innerWidth < 768 ? 768 : 1024;
 
 interface FontStack {
   display: string;
@@ -25,8 +29,8 @@ async function resolveFonts(): Promise<FontStack> {
   const mono = styles.getPropertyValue("--font-mono").trim() || "monospace";
   try {
     await Promise.all([
-      document.fonts.load(`600 40px ${display}`),
-      document.fonts.load(`400 20px ${mono}`),
+      document.fonts.load(`700 40px ${display}`),
+      document.fonts.load(`600 20px ${mono}`),
       document.fonts.ready,
     ]);
   } catch {
@@ -36,8 +40,13 @@ async function resolveFonts(): Promise<FontStack> {
   return fontStack;
 }
 
+const imageCache = new Map<string, Promise<HTMLImageElement | null>>();
+
 function loadImage(url: string): Promise<HTMLImageElement | null> {
-  return new Promise((resolve) => {
+  // Cached so a theme re-bake never re-hits the network.
+  const cached = imageCache.get(url);
+  if (cached) return cached;
+  const promise = new Promise<HTMLImageElement | null>((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     // A hung request must never strand the visitor on the loader — after the
@@ -53,6 +62,8 @@ function loadImage(url: string): Promise<HTMLImageElement | null> {
     };
     img.src = url;
   });
+  imageCache.set(url, promise);
+  return promise;
 }
 
 function roundedPath(
@@ -109,7 +120,8 @@ function fallbackGradient(
   y: number,
   w: number,
   h: number,
-  seedText: string
+  seedText: string,
+  lightness: [number, number]
 ): void {
   let hash = 0;
   for (let i = 0; i < seedText.length; i++) {
@@ -117,8 +129,8 @@ function fallbackGradient(
   }
   const hue = Math.abs(hash) % 360;
   const grad = ctx.createLinearGradient(x, y, x + w, y + h);
-  grad.addColorStop(0, `hsl(${hue}, 10%, 15%)`);
-  grad.addColorStop(1, `hsl(${(hue + 40) % 360}, 15%, 8%)`);
+  grad.addColorStop(0, `hsl(${hue}, 12%, ${lightness[0]}%)`);
+  grad.addColorStop(1, `hsl(${(hue + 40) % 360}, 16%, ${lightness[1]}%)`);
   ctx.fillStyle = grad;
   ctx.fillRect(x, y, w, h);
 }
@@ -126,8 +138,10 @@ function fallbackGradient(
 export async function createCardTexture(
   card: ResumeCard,
   aspect: number,
-  renderer: THREE.WebGLRenderer
+  renderer: THREE.WebGLRenderer,
+  theme: ThemeName
 ): Promise<THREE.CanvasTexture> {
+  const palette = themes[theme].card;
   const [fonts, img] = await Promise.all([
     resolveFonts(),
     loadImage(card.image),
@@ -135,6 +149,9 @@ export async function createCardTexture(
 
   const w = TEX_WIDTH;
   const h = Math.round(TEX_WIDTH / aspect);
+  // All metrics scale off the bake width so both phone and desktop bakes
+  // compose identically.
+  const u = TEX_WIDTH / 1024;
 
   const canvas = document.createElement("canvas");
   canvas.width = w;
@@ -142,49 +159,108 @@ export async function createCardTexture(
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D context unavailable");
 
-  const pad = 26;
-  const radius = 30;
+  const pad = Math.round(42 * u);
+  const radius = Math.round(48 * u);
 
   // ---- Card body ---------------------------------------------------------
   ctx.clearRect(0, 0, w, h);
   roundedPath(ctx, 0, 0, w, h, radius);
   const body = ctx.createLinearGradient(0, 0, 0, h);
-  body.addColorStop(0, "#101012");
-  body.addColorStop(1, "#0a0a0b");
+  body.addColorStop(0, palette.bodyTop);
+  body.addColorStop(1, palette.bodyBottom);
   ctx.fillStyle = body;
   ctx.fill();
 
   // Hairline border.
-  roundedPath(ctx, 0.75, 0.75, w - 1.5, h - 1.5, radius - 0.75);
-  ctx.strokeStyle = "rgba(255,255,255,0.12)";
-  ctx.lineWidth = 1.5;
+  roundedPath(ctx, 1.25, 1.25, w - 2.5, h - 2.5, radius - 1.25);
+  ctx.strokeStyle = palette.border;
+  ctx.lineWidth = 2.5;
   ctx.stroke();
 
-  // ---- Header row: section marker + year --------------------------------
-  ctx.fillStyle = "rgba(255,255,255,0.6)";
-  ctx.font = `500 21px ${fonts.mono}`;
+  // ---- Header row: category + date ---------------------------------------
+  // Sized for reading distance: a card spans ~200px on a laptop screen, so
+  // anything much under ~48px in the bake turns to noise. That is also why
+  // the card carries no small chips — the detail view lists every tag.
+  const category = (card.category[0] ?? "").toUpperCase();
+  const headerY = pad + Math.round(28 * u);
+  const headerGap = Math.round(32 * u);
+  let headerSize = Math.round(48 * u);
+  const headerFont = (size: number) => `600 ${size}px ${fonts.mono}`;
+  ctx.font = headerFont(headerSize);
+  while (
+    ctx.measureText(category).width +
+      ctx.measureText(card.year).width +
+      headerGap >
+      w - pad * 2 &&
+    headerSize > Math.round(34 * u)
+  ) {
+    headerSize -= 2;
+    ctx.font = headerFont(headerSize);
+  }
   ctx.textBaseline = "middle";
-  ctx.fillText(card.category[0] ?? "SECTION", pad, pad + 12);
+  ctx.fillStyle = palette.metaDim;
+  ctx.fillText(category, pad, headerY);
 
   ctx.textAlign = "right";
-  ctx.fillStyle = "rgba(255,255,255,0.38)";
-  ctx.fillText(card.year, w - pad, pad + 12);
+  ctx.fillStyle = palette.meta;
+  ctx.fillText(card.year, w - pad, headerY);
   ctx.textAlign = "left";
 
+  // ---- Footer layout (measured first so the image takes what's left) -----
+
+  // Title: one line as large as fits; long titles wrap to two lines rather
+  // than shrinking into illegibility.
+  const maxTitleW = w - pad * 2;
+  const titleFont = (size: number) => `700 ${size}px ${fonts.display}`;
+  const fits = (text: string, size: number) => {
+    ctx.font = titleFont(size);
+    return ctx.measureText(text).width <= maxTitleW;
+  };
+  let titleSize = Math.round(112 * u);
+  let titleLines = [card.title];
+  while (!fits(card.title, titleSize) && titleSize > Math.round(84 * u)) {
+    titleSize -= 2;
+  }
+  if (!fits(card.title, titleSize)) {
+    const words = card.title.split(" ");
+    let best: [string, string] = [card.title, ""];
+    let bestWidth = Infinity;
+    ctx.font = titleFont(titleSize);
+    for (let i = 1; i < words.length; i++) {
+      const a = words.slice(0, i).join(" ");
+      const b = words.slice(i).join(" ");
+      const widest = Math.max(ctx.measureText(a).width, ctx.measureText(b).width);
+      if (widest < bestWidth) {
+        bestWidth = widest;
+        best = [a, b];
+      }
+    }
+    titleLines = best[1] ? best : [card.title];
+    while (
+      titleLines.some((line) => !fits(line, titleSize)) &&
+      titleSize > Math.round(60 * u)
+    ) {
+      titleSize -= 2;
+    }
+  }
+  const titleLineH = Math.round(titleSize * 1.08);
+
+  const footerH = Math.round(30 * u) + titleLines.length * titleLineH;
+
   // ---- Image window ------------------------------------------------------
-  const imgTop = pad + 44;
-  const imgBottom = h - 128;
+  const imgTop = pad + Math.round(84 * u);
+  const imgBottom = h - pad - footerH;
   const imgX = pad;
   const imgW = w - pad * 2;
   const imgH = imgBottom - imgTop;
 
   ctx.save();
-  
+
   if (img) {
     if (card.objectFit === 'contain' || card.objectFit === 'contain-dark') {
-        // For contain, we don't clip tightly because we might want a background color 
+        // For contain, we don't clip tightly because we might want a background color
         // to fill the letterboxing. Let's fill the background with white since logos often need it.
-        roundedPath(ctx, imgX, imgTop, imgW, imgH, 16);
+        roundedPath(ctx, imgX, imgTop, imgW, imgH, Math.round(26 * u));
         if (card.objectFit === 'contain') {
           ctx.fillStyle = "#ffffff";
           ctx.fill();
@@ -192,46 +268,36 @@ export async function createCardTexture(
         ctx.clip();
         drawContain(ctx, img, imgX, imgTop, imgW, imgH);
     } else {
-        roundedPath(ctx, imgX, imgTop, imgW, imgH, 16);
+        roundedPath(ctx, imgX, imgTop, imgW, imgH, Math.round(26 * u));
         ctx.clip();
         drawCover(ctx, img, imgX, imgTop, imgW, imgH);
-        // Gentle darkening keeps white photos from blowing out the dark room.
-        ctx.fillStyle = "rgba(5,5,5,0.14)";
+        // Gentle scrim seats bright photos into the room (no-op in light).
+        ctx.fillStyle = palette.imageScrim;
         ctx.fillRect(imgX, imgTop, imgW, imgH);
     }
   } else {
-    roundedPath(ctx, imgX, imgTop, imgW, imgH, 16);
+    roundedPath(ctx, imgX, imgTop, imgW, imgH, Math.round(26 * u));
     ctx.clip();
-    fallbackGradient(ctx, imgX, imgTop, imgW, imgH, card.slug);
+    fallbackGradient(
+      ctx,
+      imgX,
+      imgTop,
+      imgW,
+      imgH,
+      card.slug,
+      palette.fallbackLightness
+    );
   }
   ctx.restore();
 
   // ---- Title -------------------------------------------------------------
-  const titleY = imgBottom + 44;
-  ctx.fillStyle = "rgba(248,247,243,0.97)";
-  let titleSize = 46;
-  ctx.font = `600 ${titleSize}px ${fonts.display}`;
-  while (ctx.measureText(card.title).width > w - pad * 2 && titleSize > 26) {
-    titleSize -= 2;
-    ctx.font = `600 ${titleSize}px ${fonts.display}`;
-  }
-  ctx.fillText(card.title, pad, titleY);
-
-  // ---- Footer: category chips --------------------------------------------
-  const chipY = h - pad - 18;
-  let chipX = pad;
-  ctx.font = `500 18px ${fonts.mono}`;
-  for (const cat of card.category.slice(0, 3)) {
-    const tw = ctx.measureText(cat).width;
-    const cw = tw + 30;
-    roundedPath(ctx, chipX, chipY - 17, cw, 34, 17);
-    ctx.strokeStyle = "rgba(255,255,255,0.22)";
-    ctx.lineWidth = 1.25;
-    ctx.stroke();
-    ctx.fillStyle = "rgba(255,255,255,0.6)";
-    ctx.fillText(cat, chipX + 15, chipY + 1);
-    chipX += cw + 10;
-    if (chipX > w - pad - 60) break;
+  ctx.fillStyle = palette.title;
+  ctx.font = titleFont(titleSize);
+  ctx.textBaseline = "alphabetic";
+  let baseline = imgBottom + Math.round(30 * u) + titleSize * 0.8;
+  for (const line of titleLines) {
+    ctx.fillText(line, pad, baseline);
+    baseline += titleLineH;
   }
 
   // ---- GPU upload ---------------------------------------------------------

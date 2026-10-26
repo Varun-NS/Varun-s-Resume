@@ -2,15 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Semantic tokens as RGB triplets so Tailwind opacity modifiers keep working.
+   Dark is the default room; [data-theme="light"] flips it to a bright,
+   warm-paper gallery. The attribute is stamped pre-hydration in layout.tsx. */
 :root {
   color-scheme: dark;
+  --void: 5 5 5; /* page + room background */
+  --ink: 11 11 12; /* raised surfaces */
+  --fog: 242 241 238; /* primary text */
+  --smoke: 141 141 147; /* muted text */
+  --hairline: rgba(255, 255, 255, 0.1);
+  --vignette-mid: rgba(0, 0, 0, 0.24);
+  --vignette-edge: rgba(0, 0, 0, 0.42);
+  --scrim: 0 0 0; /* soft backdrop behind centered hero text */
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --void: 242 239 231;
+  --ink: 250 248 243;
+  --fog: 28 27 24;
+  --smoke: 107 106 100;
+  --hairline: rgba(28, 27, 22, 0.13);
+  --vignette-mid: rgba(96, 88, 70, 0.08);
+  --vignette-edge: rgba(96, 88, 70, 0.18);
+  --scrim: 242 239 231;
 }
 
 html,
 body {
   height: 100%;
-  background: #050505;
-  color: #f2f1ee;
+  background: rgb(var(--void));
+  color: rgb(var(--fog));
   overflow: hidden;
   overscroll-behavior: none;
 }
@@ -21,13 +44,13 @@ body {
 }
 
 ::selection {
-  background: rgba(242, 241, 238, 0.9);
-  color: #050505;
+  background: rgb(var(--fog) / 0.9);
+  color: rgb(var(--void));
 }
 
 /* Focus visibility for keyboard users — never removed, only styled. */
 :focus-visible {
-  outline: 1.5px solid rgba(242, 241, 238, 0.85);
+  outline: 1.5px solid rgb(var(--fog) / 0.85);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -48,9 +71,9 @@ canvas {
 .vignette {
   background: radial-gradient(
     ellipse at center,
-    transparent 52%,
-    rgba(0, 0, 0, 0.32) 88%,
-    rgba(0, 0, 0, 0.55) 100%
+    transparent 55%,
+    var(--vignette-mid) 88%,
+    var(--vignette-edge) 100%
   );
 }
 
@@ -59,16 +82,9 @@ canvas {
   width: 5px;
 }
 .detail-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgb(var(--fog) / 0.18);
   border-radius: 999px;
 }
 .detail-scroll::-webkit-scrollbar-track {
   background: transparent;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .has-custom-cursor,
-  .has-custom-cursor * {
-    cursor: none !important;
-  }
 }

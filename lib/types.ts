@@ -8,6 +8,10 @@ export interface ResumeCard {
   image: string;
   objectFit?: 'cover' | 'contain' | 'contain-dark';
   description: string;
+  /** Simple-page wording, for descriptions written for the 3D sphere. */
+  simpleDescription?: string;
+  /** Named buttons (live demo, slides, …); the first is the primary one. */
+  links?: { label: string; url: string }[];
 }
 
 export interface ResumeProfile {

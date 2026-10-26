@@ -4,14 +4,15 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import Lenis from "lenis";
+import { RichText } from "./RichText";
 import type { ResumeCard } from "@/lib/types";
 import { registerMotion } from "@/lib/motion";
-import { audio } from "@/lib/audio";
 import {
   getExperienceState,
   setExperienceState,
   useExperience,
 } from "@/lib/store";
+import { glassPanel, glassSheen } from "@/lib/theme";
 
 if (typeof window !== "undefined") registerMotion();
 
@@ -27,6 +28,7 @@ export function DetailView({ card }: { card: ResumeCard }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const leaving = useRef(false);
   const reducedMotion = useExperience((s) => s.reducedMotion);
+  const theme = useExperience((s) => s.theme);
 
   // Claim focus on mount. Covers all three entrances: a card click (already
   // focusing), keyboard/screen-reader navigation (start the flight now), and
@@ -97,7 +99,6 @@ export function DetailView({ card }: { card: ResumeCard }) {
   const goBack = () => {
     if (leaving.current || !rootRef.current) return;
     leaving.current = true;
-    audio.close();
     // The sphere starts reversing immediately; the reader slips away over it.
     setExperienceState({ phase: "unfocusing" });
     gsap.to(rootRef.current, {
@@ -105,7 +106,7 @@ export function DetailView({ card }: { card: ResumeCard }) {
       y: reducedMotion ? 0 : 24,
       duration: reducedMotion ? 0.25 : 0.55,
       ease: "exit",
-      onComplete: () => router.push("/"),
+      onComplete: () => router.push("/", { scroll: false }),
     });
   };
 
@@ -124,7 +125,7 @@ export function DetailView({ card }: { card: ResumeCard }) {
         type="button"
         onClick={goBack}
         data-detail
-        className="fixed left-6 top-16 z-10 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-smoke transition-colors duration-200 hover:text-fog sm:left-8 sm:top-20"
+        className="fixed left-6 top-[76px] z-10 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-fog/75 transition-colors duration-200 hover:text-fog sm:left-8 sm:top-20"
         aria-label="Back to gallery"
       >
         <svg
@@ -145,21 +146,42 @@ export function DetailView({ card }: { card: ResumeCard }) {
         Back to gallery
       </button>
 
+      {/* Scrolled text fades out beneath the fixed chrome instead of
+          colliding with the name, toggles and back link. */}
+      <div
+        className="pointer-events-none fixed inset-x-0 top-0 z-[5] h-32 bg-gradient-to-b from-void from-40% via-void/85 to-transparent sm:h-40"
+        aria-hidden="true"
+      />
+
       <div
         ref={scrollRef}
         className="detail-scroll h-full overflow-y-auto"
       >
         <article
           ref={contentRef}
-          className="mx-auto max-w-3xl px-6 pb-36 pt-[19vh] sm:px-8"
+          className="mx-auto max-w-3xl px-4 pb-36 pt-[16vh] sm:px-6"
         >
+          {/* The reading surface: the same liquid-glass slab as the hero, so
+              the text sits on frosted glass instead of the raw room. */}
+          <div
+            className={`relative overflow-hidden rounded-[32px] border px-5 py-6 backdrop-blur-2xl backdrop-saturate-150 sm:px-10 sm:py-10 ${glassPanel[theme]}`}
+          >
+            <div
+              className={`pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b ${glassSheen[theme]} to-transparent`}
+              aria-hidden="true"
+            />
+            <div
+              className="pointer-events-none absolute inset-0 rounded-[32px] ring-1 ring-inset ring-white/10"
+              aria-hidden="true"
+            />
+            <div className="relative">
           <div data-detail className="overflow-hidden rounded-2xl border border-hairline shadow-2xl">
             {/* Same URL the sphere texture used — served straight from cache. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={card.image}
               alt={card.title}
-              className={`h-[46vh] w-full sm:h-[52vh] ${
+              className={`h-[32vh] w-full sm:h-[52vh] ${
                 card.objectFit === 'contain' 
                   ? 'object-contain bg-white p-8' 
                   : card.objectFit === 'contain-dark'
@@ -173,12 +195,12 @@ export function DetailView({ card }: { card: ResumeCard }) {
             {card.category.map((cat) => (
               <span
                 key={cat}
-                className="rounded-full border border-white/20 bg-white/5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-smoke"
+                className="rounded-full border border-fog/25 bg-fog/5 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-fog/75"
               >
                 {cat}
               </span>
             ))}
-            <span className="ml-auto font-mono text-[11px] uppercase tracking-[0.18em] text-smoke">
+            <span className="ml-auto font-mono text-xs font-semibold uppercase tracking-[0.16em] text-fog/75">
               {card.year}
             </span>
           </div>
@@ -186,7 +208,7 @@ export function DetailView({ card }: { card: ResumeCard }) {
           {card.eyebrow && (
             <h2 
               data-detail 
-              className="mt-6 mb-2 text-xl font-light uppercase tracking-[0.2em] text-white/40 font-mono"
+              className="mt-6 mb-2 font-mono text-sm font-semibold uppercase tracking-[0.2em] text-fog/70 sm:text-base"
             >
               {card.eyebrow}
             </h2>
@@ -202,46 +224,37 @@ export function DetailView({ card }: { card: ResumeCard }) {
           </p>
 
           <div data-detail className="mt-10 border-t border-hairline pt-10">
-            <div className="max-w-2xl text-base leading-relaxed text-[#c9c8c4] sm:text-lg space-y-4">
-              {card.description.split('\n').map((paragraph, i) => {
-                // Parse markdown links [text](url) and bold **text**
-                // We'll use a regex that matches either a link or bold text
-                const parts = paragraph.split(/(\[.*?\]\(.*?\)|\*\*.*?\*\*)/g);
-                return (
-                  <p key={i}>
-                    {parts.map((part, j) => {
-                      if (part.startsWith('**') && part.endsWith('**')) {
-                        return <strong key={j} className="text-white font-medium">{part.slice(2, -2)}</strong>;
-                      }
-                      
-                      const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
-                      if (linkMatch) {
-                        return (
-                          <a 
-                            key={j} 
-                            href={linkMatch[2]} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-white underline decoration-white/30 underline-offset-4 hover:decoration-white transition-colors"
-                          >
-                            {linkMatch[1]}
-                          </a>
-                        );
-                      }
-                      
-                      return part;
-                    })}
-                  </p>
-                );
-              })}
-            </div>
-            
+            <RichText
+              text={card.description}
+              className="max-w-2xl text-base leading-relaxed text-fog/90 sm:text-lg"
+            />
+
+            {card.links && card.links.length > 0 && (
+              <div className="mt-8 flex flex-wrap gap-3">
+                {card.links.map((link, i) => (
+                  <a
+                    key={link.url}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center rounded-full px-6 py-3 font-mono text-sm font-semibold tracking-wide transition-colors ${
+                      i === 0
+                        ? "bg-fog text-void hover:bg-fog/85"
+                        : "border border-fog/30 text-fog hover:border-fog/60 hover:bg-fog/10"
+                    }`}
+                  >
+                    {link.label} ↗
+                  </a>
+                ))}
+              </div>
+            )}
+
             {card.slug === "download-resume" && (
               <div className="mt-8 flex justify-start">
                 <a 
                   href="/resume.pdf" 
                   download="Varun_NS_Resume.pdf"
-                  className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-white px-8 py-3.5 font-mono text-sm font-semibold tracking-wide text-black transition-all hover:scale-105 active:scale-95"
+                  className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-fog px-8 py-3.5 font-mono text-sm font-semibold tracking-wide text-void transition-all hover:scale-105 active:scale-95"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -251,10 +264,12 @@ export function DetailView({ card }: { card: ResumeCard }) {
                     </svg>
                     Download PDF
                   </span>
-                  <div className="absolute inset-0 z-0 bg-white/50 blur-md transition-opacity group-hover:opacity-100 opacity-0" />
+                  <div className="absolute inset-0 z-0 bg-fog/50 blur-md transition-opacity group-hover:opacity-100 opacity-0" />
                 </a>
               </div>
             )}
+          </div>
+            </div>
           </div>
         </article>
       </div>

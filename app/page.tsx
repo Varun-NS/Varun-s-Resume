@@ -22,7 +22,7 @@ export default function HomePage() {
             <ul>
               {section.cards.map((card) => (
                 <li key={card.slug}>
-                  <Link href={`/project/${card.slug}`}>
+                  <Link href={`/project/${card.slug}`} scroll={false}>
                     {card.title} — {card.subtitle}
                   </Link>
                 </li>

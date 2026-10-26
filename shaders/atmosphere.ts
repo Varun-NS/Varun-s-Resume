@@ -1,7 +1,8 @@
 /**
  * Inner-surface gradient for the room the visitor stands in.
- * A near-black horizon band keeps the space from reading as a flat void
- * and gives the cards something to float against.
+ * A horizon band keeps the space from reading as a flat void and gives the
+ * cards something to float against. Colors arrive as uniforms so the same
+ * shell serves both the midnight room and the daylight gallery.
  */
 
 export const atmosphereVertex = /* glsl */ `
@@ -15,17 +16,17 @@ export const atmosphereVertex = /* glsl */ `
 `;
 
 export const atmosphereFragment = /* glsl */ `
+  uniform vec3 uDeep;
+  uniform vec3 uBand;
   varying vec3 vWorldPosition;
 
   void main() {
     vec3 dir = normalize(vWorldPosition);
 
-    // Horizon band: brightest at the equator, falling off toward the poles.
+    // Horizon band: strongest at the equator, falling off toward the poles.
     float horizon = pow(1.0 - abs(dir.y), 3.0);
 
-    vec3 deep = vec3(0.00, 0.00, 0.00); // True black
-    vec3 band = vec3(0.012, 0.014, 0.020); // Very subtle dark blue/gray horizon
-    vec3 color = mix(deep, band, horizon * 0.85);
+    vec3 color = mix(uDeep, uBand, horizon * 0.85);
 
     gl_FragColor = vec4(color, 1.0);
   }

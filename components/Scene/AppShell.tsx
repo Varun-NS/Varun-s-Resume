@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import { gsap } from "gsap";
@@ -11,11 +11,14 @@ import {
   setExperienceState,
   useExperience,
 } from "@/lib/store";
+import { readInitialTheme } from "@/lib/theme";
 import { Header } from "@/components/UI/Header";
+import { Hero } from "@/components/UI/Hero";
 import { SectionNavigation } from "@/components/UI/SectionNavigation";
 import { Loader } from "@/components/UI/Loader";
-import { Cursor } from "@/components/UI/Cursor";
 import { Veil, FilmOverlays } from "@/components/UI/Overlays";
+import { ModeSwitch } from "@/components/UI/ModeSwitch";
+import { SimpleResume } from "@/components/Simple/SimpleResume";
 
 if (typeof window !== "undefined") registerMotion();
 
@@ -25,16 +28,52 @@ const Experience = dynamic(
 );
 
 /**
- * Persistent shell around every route. The WebGL scene mounts once here and
- * never remounts — routes only swap the DOM overlay, which is what makes the
- * gallery↔detail transition feel like a single continuous space.
+ * Persistent shell around every route. Visitors land on the simple
+ * scrollable resume; the WebGL scene mounts the first time they switch to
+ * 3D and then never remounts — it is only hidden (and paused) while the
+ * simple page shows. Routes only swap the DOM overlay above it, which is
+ * what makes the gallery↔detail transition feel like one continuous space.
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const phase = useExperience((s) => s.phase);
   const focusedSlug = useExperience((s) => s.focusedSlug);
+  const hoveredSlug = useExperience((s) => s.hoveredSlug);
+  const dragging = useExperience((s) => s.dragging);
+  const storeMode = useExperience((s) => s.mode);
   const pushScheduled = useRef<gsap.core.Tween | null>(null);
+
+  // A card deep link (/project/…) belongs to the 3D view. Until the store
+  // has been synced, derive the mode from the path so the server render
+  // and first paint already match.
+  const [modeSynced, setModeSynced] = useState(false);
+  useEffect(() => {
+    if (pathname.startsWith("/project/")) {
+      setExperienceState({ mode: "immersive" });
+    }
+    setModeSynced(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const mode = modeSynced
+    ? storeMode
+    : pathname.startsWith("/project/")
+      ? "immersive"
+      : "simple";
+  const immersive = mode === "immersive";
+
+  // Mount the 3D layer on first use only; afterwards keep it alive.
+  const [immersiveMounted, setImmersiveMounted] = useState(immersive);
+  if (immersive && !immersiveMounted) setImmersiveMounted(true);
+
+  // Plain system cursor throughout — just a hint of what's draggable/
+  // clickable via the standard grab/pointer glyphs recruiters already know.
+  const sceneCursor = dragging ? "grabbing" : hoveredSlug ? "pointer" : "grab";
+
+  // Adopt the theme the pre-hydration script stamped on <html>.
+  useEffect(() => {
+    setExperienceState({ theme: readInitialTheme() });
+  }, []);
 
   // Respect the visitor's reduced-motion preference, live.
   useEffect(() => {
@@ -70,7 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const reduced = getExperienceState().reducedMotion;
     pushScheduled.current?.kill();
     pushScheduled.current = gsap.delayedCall(reduced ? 0.15 : 0.85, () => {
-      router.push(target);
+      router.push(target, { scroll: false });
     });
     return () => {
       pushScheduled.current?.kill();
@@ -89,16 +128,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-scene" aria-hidden="true">
-        <Experience />
-      </div>
-      <Veil />
-      {children}
-      <Header />
-      <SectionNavigation />
-      <FilmOverlays />
-      <Loader />
-      <Cursor />
+      {!immersive && <SimpleResume />}
+      {immersiveMounted && (
+        <div hidden={!immersive}>
+          <div
+            className="fixed inset-0 z-scene"
+            style={{ cursor: sceneCursor }}
+            aria-hidden="true"
+          >
+            <Experience />
+          </div>
+          <Veil />
+          {children}
+          <Hero />
+          <Header />
+          <SectionNavigation />
+          <FilmOverlays />
+          <Loader />
+        </div>
+      )}
+      <ModeSwitch mode={mode} />
     </>
   );
 }

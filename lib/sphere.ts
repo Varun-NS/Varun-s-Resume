@@ -8,6 +8,12 @@ export interface CardPlacement {
   sectionTitle: string;
   /** World position on the inside of the sphere. */
   position: [number, number, number];
+  /**
+   * Orientation (x, y, z, w). Cards share their section's frame so a grid
+   * reads upright on screen — aiming each one at the centre with world-up
+   * would fan the outer columns of high-latitude sections like meridians.
+   */
+  quaternion: [number, number, number, number];
   /** Plane width/height in world units. */
   width: number;
   height: number;
@@ -26,6 +32,8 @@ export interface SectionPlacement {
   labelPosition: [number, number, number];
   panelWidthAngle: number;
   panelHeightAngle: number;
+  /** Grid rows (1 or 2). */
+  rows: number;
 }
 
 export interface SphereLayout {
@@ -38,17 +46,31 @@ export interface SphereLayout {
  * camera in, oversized ones push it back so their outer rows stay in view.
  * Negative values move the camera toward the section.
  */
-export function sectionZoomOffset(section: SectionPlacement): number {
+export function sectionZoomOffset(
+  section: SectionPlacement,
+  aspect: number = typeof window !== "undefined"
+    ? window.innerWidth / window.innerHeight
+    : 16 / 10
+): number {
+  // Single-row sections on a landscape screen have vertical room to spare,
+  // so they frame by width and pull in further — their cards would
+  // otherwise sit small mid-frame. Portrait screens are width-starved, so
+  // they keep the conservative height-weighted framing.
+  const singleRow = section.rows === 1 && aspect >= 1.2;
+  // Height is the constrained axis: the floating title sits above the grid
+  // and the nav bar eats the bottom of the frame, and dollying toward the
+  // shell inflates angular size beyond what these center-measured angles
+  // suggest. Weighting height keeps two-row grids fully in frame.
   const maxAngle = Math.max(
     section.panelWidthAngle,
-    section.panelHeightAngle
+    singleRow ? 0 : section.panelHeightAngle * 1.2
   );
   // Backing off needs a steeper slope than zooming in: an oversized grid
   // wraps around the camera, so every extra radian costs more distance.
   // The back-off cap keeps even the widest section out of heavy fog.
   const gap = 1.6 - maxAngle;
-  const offset = -gap * (gap > 0 ? 65 : 220);
-  return Math.max(-45, Math.min(25, offset));
+  const offset = -gap * (gap > 0 ? (singleRow ? 80 : 65) : 220);
+  return Math.max(singleRow ? -38 : -45, Math.min(25, offset));
 }
 
 // Increased radius for massive 360° planetary feel
@@ -76,8 +98,8 @@ export function buildPlacements(
   // Grid rhythm: a card spans ~0.23 rad vertically and ~0.17 rad in yaw, so
   // these steps leave a gap of roughly 40% of a card between neighbours —
   // tight enough to read as one grid, loose enough for the eyebrow labels.
-  const cardWidthAngle = 0.26;
-  const cardHeightAngle = 0.34;
+  const cardWidthAngle = 0.245;
+  const cardHeightAngle = 0.31;
 
   // Latitude of the upper/lower bands (~39°): high enough to clear the
   // equator rows, low enough that cards there don't roll on screen.
@@ -148,6 +170,7 @@ export function buildPlacements(
     // Calculate exact center position of this section's region
     const centerEuler = new THREE.Euler(sector.pitch, sector.yaw, 0, "YXZ");
     const centerVec = new THREE.Vector3(0, 0, -radius).applyEuler(centerEuler);
+    const sectionQuat = new THREE.Quaternion().setFromEuler(centerEuler);
 
     // Label goes above the top row — close enough to stay inside the FOV
     // when the camera frames the section.
@@ -156,14 +179,9 @@ export function buildPlacements(
     const labelEuler = new THREE.Euler(labelPitch, sector.yaw, 0, "YXZ");
     const labelVec = new THREE.Vector3(0, 0, -radius).applyEuler(labelEuler);
 
-    // Away from the equator, meridians converge: a fixed yaw step shrinks to
-    // yawStep·cos(pitch) of real distance. Widen the step so the physical
-    // gap between columns stays constant on every row.
-    const rowYawStep = (rowPitch: number) =>
-      cardWidthAngle / Math.max(0.45, Math.cos(rowPitch));
-    const widestRowStep = rowYawStep(
-      Math.abs(sector.pitch) + topRowPitchOffset
-    );
+    // Cards are laid out in the section's own frame (as if it sat on the
+    // equator), so columns stay evenly spaced at any latitude.
+    const widestRowStep = cardWidthAngle;
 
     // Panel angular size (with generous 8-12% padding)
     const paddingAngle = 0.2;
@@ -179,6 +197,7 @@ export function buildPlacements(
       labelPosition: [labelVec.x, labelVec.y, labelVec.z],
       panelWidthAngle,
       panelHeightAngle,
+      rows,
     });
 
     section.cards.forEach((card, i) => {
@@ -187,12 +206,13 @@ export function buildPlacements(
       const c = i % cols;
 
       const localPitch = - (r - (rows - 1) / 2) * cardHeightAngle;
-      const cardPitch = sector.pitch + localPitch;
       // Invert yaw calculation: c=0 should be left (+yaw), higher c should move right (-yaw)
-      const localYaw = ((itemsInRow - 1) / 2 - c) * rowYawStep(cardPitch);
-      const cardYaw = sector.yaw + localYaw;
-      const euler = new THREE.Euler(cardPitch, cardYaw, 0, "YXZ");
-      const vec = new THREE.Vector3(0, 0, -radius).applyEuler(euler);
+      const localYaw = ((itemsInRow - 1) / 2 - c) * cardWidthAngle;
+      const localQuat = new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(localPitch, localYaw, 0, "YXZ")
+      );
+      const quat = sectionQuat.clone().multiply(localQuat);
+      const vec = new THREE.Vector3(0, 0, -radius).applyQuaternion(quat);
 
       // Uniform cards for clean exhibition grid
       const scale = 2.4; // 25% larger cards
@@ -207,6 +227,7 @@ export function buildPlacements(
         index: globalIndex,
         sectionTitle: section.title,
         position: [vec.x, vec.y, vec.z],
+        quaternion: [quat.x, quat.y, quat.z, quat.w],
         width,
         height,
         seed,

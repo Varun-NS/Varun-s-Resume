@@ -6,6 +6,8 @@ import resume from "@/data/resume.json";
 import type { ResumeData } from "@/lib/types";
 import { useExperience } from "@/lib/store";
 import { audio } from "@/lib/audio";
+import { ThemeToggle } from "./ThemeToggle";
+import { MODE_SWITCH_SPACE } from "./ModeSwitch";
 
 const data = resume as ResumeData;
 
@@ -23,9 +25,9 @@ function SoundToggle() {
       onClick={() => {
         audio.init();
         audio.setMuted(!muted);
-        if (muted) audio.tick(); // audible confirmation only when unmuting
+        if (muted) audio.hover(); // audible confirmation only when unmuting
       }}
-      className="pointer-events-auto font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog opacity-0 transition-colors duration-200 hover:text-white"
+      className="pointer-events-auto hidden whitespace-nowrap font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog/70 opacity-0 transition-colors duration-200 hover:text-fog sm:inline"
       aria-pressed={!muted}
       aria-label={muted ? "Turn sound on" : "Turn sound off"}
     >
@@ -86,20 +88,24 @@ export function Header() {
       className="pointer-events-none fixed inset-0 z-chrome flex flex-col justify-between p-6 sm:p-8"
     >
       <header className="flex items-start justify-between">
-        <div data-chrome className="opacity-0">
-          <p className="text-base font-bold tracking-wide text-white">
+        <div data-chrome className="min-w-0 opacity-0">
+          <p className="text-base font-bold tracking-wide text-fog">
             {data.profile.name}
           </p>
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog">
+          {/* One line on phones: wrapping pushed it into the back link. */}
+          <p className="truncate font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-fog/70 sm:whitespace-normal sm:tracking-[0.18em]">
             {data.profile.role}
           </p>
         </div>
-        <div className="flex items-center gap-5 sm:gap-6">
+        <div
+          className={`flex h-10 shrink-0 items-center gap-4 sm:h-11 sm:gap-6 ${MODE_SWITCH_SPACE}`}
+        >
+          <ThemeToggle chrome />
           <SoundToggle />
           <a
             data-chrome
             href={`mailto:${data.profile.email}`}
-            className="pointer-events-auto hidden font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog opacity-0 transition-colors duration-200 hover:text-white sm:inline"
+            className="pointer-events-auto hidden font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog/70 opacity-0 transition-colors duration-200 hover:text-fog lg:inline"
           >
             {data.profile.email}
           </a>
@@ -107,8 +113,7 @@ export function Header() {
             data-chrome
             href="/resume.pdf"
             download
-            onClick={() => audio.tick()}
-            className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/30 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white opacity-0 transition-colors duration-200 hover:border-white/60 hover:bg-white/10"
+            className="pointer-events-auto hidden items-center gap-1.5 rounded-full border border-fog/30 px-3 py-1.5 sm:flex font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-fog opacity-0 transition-colors duration-200 hover:border-fog/60 hover:bg-fog/10"
           >
             Resume
             <svg
@@ -130,11 +135,11 @@ export function Header() {
         </div>
       </header>
 
-      <footer className="flex items-end justify-between">
+      <footer className="hidden justify-center pb-[72px] sm:flex">
         <p
           data-chrome
           ref={hintRef}
-          className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-fog opacity-0"
+          className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-fog/70 opacity-0"
         >
           Drag to look around · Click a card to open
         </p>

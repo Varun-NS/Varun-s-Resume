@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { useExperience } from "@/lib/store";
+import { themes } from "@/lib/theme";
 import type { SectionPlacement } from "@/lib/sphere";
 import { SPHERE_RADIUS } from "@/lib/sphere";
 
@@ -14,6 +15,7 @@ interface SectionPanelProps {
 export function SectionPanel({ section }: SectionPanelProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const activeSection = useExperience((s) => s.activeSection);
+  const theme = useExperience((s) => s.theme);
 
   // Create a perfectly curved spherical patch centered on -Z axis
   const geometry = useMemo(() => {
@@ -45,7 +47,7 @@ export function SectionPanel({ section }: SectionPanelProps) {
 
   const material = useMemo(() => {
     return new THREE.MeshPhysicalMaterial({
-      color: 0x111115,
+      color: 0x111115, // retinted per theme below
       emissive: 0x222230,
       emissiveIntensity: 0.0,
       transparent: true,
@@ -59,6 +61,18 @@ export function SectionPanel({ section }: SectionPanelProps) {
     });
   }, []);
 
+  useEffect(() => {
+    const spec = themes[theme];
+    material.color.setHex(spec.panelColor);
+    material.emissive.setHex(spec.panelEmissive);
+    // Daylight walls must be matte: with gloss/clearcoat, the directional
+    // lights sweep bright specular patches across the background as the
+    // camera drifts with the pointer — it reads as white flashes on paper.
+    material.roughness = theme === "light" ? 0.95 : 0.45;
+    material.metalness = theme === "light" ? 0 : 0.25;
+    material.clearcoat = theme === "light" ? 0 : 0.6;
+  }, [material, theme]);
+
   const euler = useMemo(
     () => new THREE.Euler(section.pitch, section.yaw, 0, "YXZ"),
     [section.pitch, section.yaw]
@@ -70,11 +84,14 @@ export function SectionPanel({ section }: SectionPanelProps) {
 
     const isActive = activeSection === section.title;
     const hasActive = activeSection !== null;
+    const light = theme === "light";
 
-    // Target states
-    const targetOpacity = isActive ? 0.3 : (hasActive ? 0.05 : 0.15);
-    const targetEmissive = isActive ? 0.5 : (hasActive ? 0.0 : 0.1);
-    const targetScale = isActive ? 0.995 : 1.0; 
+    mesh.visible = !light;
+
+    // Target states — the daylight room keeps its walls quiet.
+    const targetOpacity = isActive ? (light ? 0.2 : 0.3) : (hasActive ? 0.04 : (light ? 0.1 : 0.15));
+    const targetEmissive = isActive ? (light ? 0.12 : 0.5) : (hasActive ? 0.0 : (light ? 0.03 : 0.1));
+    const targetScale = isActive ? 0.995 : 1.0;
 
     // Smooth interpolation
     material.opacity += (targetOpacity - material.opacity) * 0.05;

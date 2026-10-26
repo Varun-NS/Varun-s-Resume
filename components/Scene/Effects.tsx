@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { EffectComposer } from "@react-three/postprocessing";
 import { Effect } from "postprocessing";
@@ -34,6 +34,13 @@ class GripLensEffect extends Effect {
 
 export function Effects() {
   const effect = useMemo(() => new GripLensEffect(), []);
+  // The composer only takes over the render loop while the warp is actually
+  // visible — at rest the scene renders through the default (native-AA,
+  // no fullscreen pass) path, which keeps idle frames cheap and the cursor
+  // responsive on weaker GPUs.
+  const [active, setActive] = useState(false);
+  const activeRef = useRef(false);
+  const quietFrames = useRef(0);
 
   useFrame(() => {
     const reduced = getExperienceState().reducedMotion;
@@ -41,15 +48,27 @@ export function Effects() {
     // Grip does most of the work; a whisper of released momentum keeps the
     // glass breathing while the throw decays.
     const momentum = Math.min(
-      0.05,
-      (Math.abs(s.velocityYaw) + Math.abs(s.velocityPitch)) * 0.03
+      0.035,
+      (Math.abs(s.velocityYaw) + Math.abs(s.velocityPitch)) * 0.02
     );
-    const strength = reduced ? 0 : s.grip * 0.14 + momentum;
+    const strength = reduced ? 0 : s.grip * 0.1 + momentum;
     effect.uniforms.get("uStrength")!.value = strength;
+
+    // Hysteresis so the composer doesn't flap at the threshold.
+    if (strength > 0.003) {
+      quietFrames.current = 0;
+      if (!activeRef.current) {
+        activeRef.current = true;
+        setActive(true);
+      }
+    } else if (activeRef.current && ++quietFrames.current > 30) {
+      activeRef.current = false;
+      setActive(false);
+    }
   });
 
   return (
-    <EffectComposer multisampling={4}>
+    <EffectComposer enabled={active} multisampling={4}>
       <primitive object={effect} />
     </EffectComposer>
   );

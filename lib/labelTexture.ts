@@ -2,7 +2,8 @@ import * as THREE from "three";
 
 export async function createLabelTexture(
   title: string,
-  gl: THREE.WebGLRenderer
+  gl: THREE.WebGLRenderer,
+  fill: string
 ): Promise<THREE.CanvasTexture> {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d", { alpha: true });
@@ -17,12 +18,24 @@ export async function createLabelTexture(
   // Clear background (fully transparent)
   ctx.clearRect(0, 0, width, height);
 
-  // Typography settings - match the elegant display font used in the app
-  ctx.font = "300 86px 'Space Grotesk', system-ui, sans-serif";
-  ctx.fillStyle = "rgba(255, 255, 255, 0.4)"; // Semi-transparent elegant white
+  // next/font registers Space Grotesk under a generated family name, so
+  // resolve it from the CSS variable rather than asking for it by name.
+  const family =
+    getComputedStyle(document.documentElement)
+      .getPropertyValue("--font-display")
+      .trim() || "system-ui, sans-serif";
+  const font = `600 86px ${family}`;
+  try {
+    await document.fonts.load(font);
+  } catch {
+    // Fonts failing to resolve is cosmetic — system fallbacks are fine.
+  }
+
+  ctx.font = font;
+  ctx.fillStyle = fill;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.letterSpacing = "4px";
+  ctx.letterSpacing = "6px";
 
   // Draw the text
   ctx.fillText(title.toUpperCase(), width / 2, height / 2);

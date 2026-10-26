@@ -6,6 +6,7 @@ import * as THREE from "three";
 import type { SectionPlacement } from "@/lib/sphere";
 import { createLabelTexture } from "@/lib/labelTexture";
 import { useExperience } from "@/lib/store";
+import { themes } from "@/lib/theme";
 
 interface SectionLabelsProps {
   sections: SectionPlacement[];
@@ -26,6 +27,7 @@ function SectionLabel({ section }: { section: SectionPlacement }) {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const activeSection = useExperience((s) => s.activeSection);
+  const theme = useExperience((s) => s.theme);
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
 
   const basePosition = useMemo(
@@ -49,22 +51,29 @@ function SectionLabel({ section }: { section: SectionPlacement }) {
 
   useEffect(() => {
     let live = true;
-    createLabelTexture(section.title, gl).then((tex) => {
+    createLabelTexture(section.title, gl, themes[theme].label).then((tex) => {
       if (!live) {
         tex.dispose();
         return;
       }
+      const old = material.map as THREE.Texture | null;
       setTexture(tex);
       material.map = tex;
       material.needsUpdate = true;
+      old?.dispose();
     });
     return () => {
       live = false;
-      texture?.dispose();
-      material.dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [section.title]);
+  }, [section.title, theme]);
+
+  useEffect(() => {
+    return () => {
+      (material.map as THREE.Texture | null)?.dispose();
+      material.dispose();
+    };
+  }, [material]);
 
   useEffect(() => {
     const group = groupRef.current;

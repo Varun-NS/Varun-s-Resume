@@ -3,7 +3,14 @@
 import { useSyncExternalStore } from "react";
 import type { ExperiencePhase } from "./types";
 
+/**
+ * "simple" is the default scrollable resume; "immersive" is the 3D sphere,
+ * mounted only once a visitor asks for it.
+ */
+export type ViewMode = "simple" | "immersive";
+
 export interface ExperienceState {
+  mode: ViewMode;
   phase: ExperiencePhase;
   /** Slug of the card currently focused (detail view) or animating to it. */
   focusedSlug: string | null;
@@ -15,11 +22,14 @@ export interface ExperienceState {
   /** 0..1 texture preload progress. */
   progress: number;
   reducedMotion: boolean;
+  /** Visual theme — drives DOM tokens, scene colors and card bakes. */
+  theme: "dark" | "light";
 }
 
 type Listener = () => void;
 
 let state: ExperienceState = {
+  mode: "simple",
   phase: "loading",
   focusedSlug: null,
   hoveredSlug: null,
@@ -27,6 +37,7 @@ let state: ExperienceState = {
   dragging: false,
   progress: 0,
   reducedMotion: false,
+  theme: "dark",
 };
 
 const listeners = new Set<Listener>();

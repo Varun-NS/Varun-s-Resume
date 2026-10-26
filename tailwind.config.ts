@@ -9,11 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        void: "#050505",
-        ink: "#0b0b0c",
-        fog: "#f2f1ee",
-        smoke: "#8d8d93",
-        hairline: "rgba(255,255,255,0.10)",
+        // Semantic tokens — actual values live in globals.css per theme.
+        void: "rgb(var(--void) / <alpha-value>)",
+        ink: "rgb(var(--ink) / <alpha-value>)",
+        fog: "rgb(var(--fog) / <alpha-value>)",
+        smoke: "rgb(var(--smoke) / <alpha-value>)",
+        hairline: "var(--hairline)",
       },
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],

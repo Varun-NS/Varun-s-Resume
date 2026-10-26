@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 import { gsap } from "gsap";
 import resume from "@/data/resume.json";
 import type { ResumeData } from "@/lib/types";
@@ -20,6 +22,10 @@ import { SectionPanel } from "./SectionPanel";
 if (typeof window !== "undefined") registerMotion();
 
 const data = resume as ResumeData;
+
+const tmpView = new THREE.Vector3();
+const tmpViewEuler = new THREE.Euler(0, 0, 0, "YXZ");
+const tmpSection = new THREE.Vector3();
 
 /**
  * Mounts every card and choreographs the shared moments: the intro reveal,
@@ -273,10 +279,15 @@ export function Gallery() {
   }, [phase, focusedSlug]);
 
   // ---- Hover & Section Focus ---------------------------------------------
+  const theme = useExperience((s) => s.theme);
   useEffect(() => {
     if (phase !== "idle") return;
     const hovered = hoveredSlug ? cardRegistry.get(hoveredSlug) : undefined;
     const active = activeSection;
+    // Brightness > 1 clips the light theme's white cards straight to pure
+    // white — in daylight, emphasis comes from scale and lift only, and
+    // de-emphasis stays close to 1 so nothing flashes as the pointer moves.
+    const light = theme === "light";
 
     cardRegistry.forEach((h) => {
       let brightness = 1;
@@ -286,36 +297,35 @@ export function Gallery() {
 
       const dimmed = active !== null && h.sectionTitle !== active;
       if (dimmed) {
-        // Spotlight: everything outside the framed section recedes into
-        // the dark so neighbours at the frame's edge don't compete.
-        // Low enough that even white logo cards stay ghosts.
-        brightness = 0.35;
-        opacity = 0.08;
+        // Spotlight: everything outside the framed section recedes so
+        // neighbours at the frame's edge don't compete.
+        brightness = light ? 0.94 : 0.35;
+        opacity = light ? 0.12 : 0.08;
         scale = 0.97;
         if (hovered && h.slug === hovered.slug) {
           // Still discoverable under the cursor.
-          brightness = 0.95;
+          brightness = light ? 1 : 0.95;
           opacity = 0.9;
           scale = 1.02;
         }
       } else if (active) {
-        brightness = 1.25;
+        brightness = light ? 1 : 1.25;
         scale = 1.04;
         lift = 1.5;
         if (hovered && h.slug === hovered.slug) {
-          brightness = 1.4;
+          brightness = light ? 1 : 1.4;
           scale = 1.08;
           lift = 2.2;
         }
       } else if (hovered) {
         if (h.slug === hovered.slug) {
-          brightness = 1.22;
+          brightness = light ? 1 : 1.22;
           scale = 1.06;
           lift = 2.2;
         } else if (h.direction.dot(hovered.direction) > 0.8) {
-          brightness = 0.8; // nearby cards dim slightly, not to shadow
+          brightness = light ? 0.96 : 0.8; // nearby cards dim slightly
         } else {
-          brightness = 0.9;
+          brightness = light ? 0.98 : 0.9;
         }
       }
 
@@ -329,7 +339,7 @@ export function Gallery() {
         overwrite: "auto",
       });
     });
-  }, [hoveredSlug, activeSection, phase]);
+  }, [hoveredSlug, activeSection, phase, theme]);
 
   // ---- Camera Steering for Active Section ---------------------------------
   useEffect(() => {
@@ -361,9 +371,10 @@ export function Gallery() {
       
     gsap.to(cameraState, {
       targetYaw: yawGoal,
-      // Aim a touch above the grid centre so the floating section title and
-      // the bottom nav bar both get breathing room in the frame.
-      targetPitch: section.pitch + 0.05,
+      // Aim just a hair above the grid centre: enough that the floating
+      // title stays in frame, low enough that the bottom row of a two-row
+      // grid clears the nav bar.
+      targetPitch: section.pitch + 0.02,
       zOffset: targetZOffset,
       drift: 0, // hold the framing still — no idle slide while reading a section
       duration: reduced ? 0.4 : 2.2, // increased duration for majestic pan
@@ -371,6 +382,55 @@ export function Gallery() {
       overwrite: "auto",
     });
   }, [activeSection, sections, phase]);
+
+  // ---- Settle into the nearest section -------------------------------------
+  // After a drag, once the thrown momentum dies down, whichever section the
+  // visitor ended up looking at frames itself: the camera dollies in via the
+  // same activeSection choreography the bottom nav uses. A deliberate drag
+  // (>30px, handled in CameraRig) releases it again.
+  const settleArmed = useRef(false);
+  useFrame(() => {
+    const st = getExperienceState();
+    if (st.phase !== "idle") {
+      settleArmed.current = false;
+      return;
+    }
+    if (st.dragging) {
+      settleArmed.current = true;
+      return;
+    }
+    if (!settleArmed.current || st.activeSection) return;
+    const speed =
+      Math.abs(cameraState.velocityYaw) + Math.abs(cameraState.velocityPitch);
+    if (speed > 0.12) return; // still gliding — wait for the slow-down
+    settleArmed.current = false;
+
+    tmpViewEuler.set(cameraState.pitch, cameraState.yaw, 0);
+    tmpView.set(0, 0, -1).applyEuler(tmpViewEuler);
+    let best: (typeof sections)[number] | null = null;
+    let bestDot = -1;
+    for (const sec of sections) {
+      const d = tmpSection.set(...sec.center).normalize().dot(tmpView);
+      if (d > bestDot) {
+        bestDot = d;
+        best = sec;
+      }
+    }
+    if (!best) return;
+    // Frame it only when the visitor genuinely stopped near it — roughly
+    // within the section's own footprint, clamped so oversized grids don't
+    // grab from across the room and tiny ones stay reachable.
+    const reach = Math.min(
+      0.9,
+      Math.max(
+        0.4,
+        Math.max(best.panelWidthAngle, best.panelHeightAngle) * 0.55
+      )
+    );
+    if (bestDot > Math.cos(reach)) {
+      setExperienceState({ activeSection: best.title });
+    }
+  });
 
   // Reduced motion: still the floating immediately.
   const reducedMotion = useExperience((s) => s.reducedMotion);

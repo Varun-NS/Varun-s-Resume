@@ -9,7 +9,9 @@ import { cardRegistry, type CardAnim } from "@/lib/registry";
 import {
   getExperienceState,
   setExperienceState,
+  useExperience,
 } from "@/lib/store";
+import { themes } from "@/lib/theme";
 import { audio } from "@/lib/audio";
 
 /** How close (world units) a focused card flies toward the visitor. */
@@ -31,8 +33,16 @@ export const GalleryCard = memo(function GalleryCard({
   placement,
   onReady,
 }: GalleryCardProps) {
-  const { card, position, width, height, floatPhase, floatSpeed, tilt } =
-    placement;
+  const {
+    card,
+    position,
+    quaternion,
+    width,
+    height,
+    floatPhase,
+    floatSpeed,
+    tilt,
+  } = placement;
   const gl = useThree((s) => s.gl);
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
@@ -64,13 +74,14 @@ export const GalleryCard = memo(function GalleryCard({
     []
   );
 
-  // Orient once: the plane's +Z looks back at the sphere's centre.
+  // Orient once: the plane's +Z looks back at the sphere's centre, upright
+  // in its section's frame.
   useEffect(() => {
     const group = groupRef.current;
     if (!group) return;
     group.position.copy(basePosition);
-    group.lookAt(0, 0, 0);
-  }, [basePosition]);
+    group.quaternion.fromArray(quaternion);
+  }, [basePosition, quaternion]);
 
   // Register with the shared choreography registry.
   useEffect(() => {
@@ -91,30 +102,47 @@ export const GalleryCard = memo(function GalleryCard({
   }, [card.slug, placement.index, anim, direction, basePosition]);
 
   // Bake the card texture (image + type + chips) and hand it to the GPU.
+  // Re-runs on theme change: images come from cache, so a full re-bake of
+  // the room is a beat of canvas work, not a reload.
+  const theme = useExperience((s) => s.theme);
+  const readyOnce = useRef(false);
   useEffect(() => {
     let live = true;
-    let texture: THREE.CanvasTexture | null = null;
-    createCardTexture(card, width / height, gl)
+    createCardTexture(card, width / height, gl, theme)
       .then((tex) => {
         if (!live) {
           tex.dispose();
           return;
         }
-        texture = tex;
+        const old = material.map as THREE.Texture | null;
         material.map = tex;
         material.needsUpdate = true;
-        onReady();
+        old?.dispose();
+        if (!readyOnce.current) {
+          readyOnce.current = true;
+          onReady();
+        }
       })
       .catch(() => {
-        if (live) onReady(); // never let one bad asset stall the room
+        // Never let one bad asset stall the room.
+        if (live && !readyOnce.current) {
+          readyOnce.current = true;
+          onReady();
+        }
       });
     return () => {
       live = false;
-      texture?.dispose();
-      material.dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [theme]);
+
+  // GPU resources live exactly as long as the mesh.
+  useEffect(() => {
+    return () => {
+      (material.map as THREE.Texture | null)?.dispose();
+      material.dispose();
+    };
+  }, [material]);
 
   // ---- Per-frame motion ----------------------------------------------------
   useFrame(({ clock }) => {
@@ -175,7 +203,6 @@ export const GalleryCard = memo(function GalleryCard({
     if (e.delta > 6) return;
     const s = getExperienceState();
     if (s.phase !== "idle") return;
-    audio.open();
     setExperienceState({
       phase: "focusing",
       focusedSlug: card.slug,
@@ -201,6 +228,7 @@ export const GalleryCard = memo(function GalleryCard({
 
 function CardEyebrow({ eyebrow, width, height, anim, material: parentMaterial }: { eyebrow: string; width: number; height: number; anim: any; material: THREE.MeshBasicMaterial }) {
   const gl = useThree((s) => s.gl);
+  const theme = useExperience((s) => s.theme);
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -217,62 +245,105 @@ function CardEyebrow({ eyebrow, width, height, anim, material: parentMaterial }:
   );
 
   useEffect(() => {
-    let live = true;
-    
+    let cancelled = false;
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
-    
-    // Wider canvas to fit long titles (e.g. "Business Development Associate")
-    const canvasW = 1024;
-    const canvasH = 128;
-    canvas.width = canvasW;
-    canvas.height = canvasH;
-    
-    ctx.clearRect(0, 0, canvasW, canvasH);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    
-    const text = eyebrow.toUpperCase();
-    
-    // Start with a large font, scale down if it exceeds the canvas width
-    let fontSize = 64;
-    ctx.font = `300 ${fontSize}px 'Space Grotesk', system-ui, sans-serif`;
-    ctx.letterSpacing = "4px"; // Standard letter spacing
 
-    while (ctx.measureText(text).width > canvasW - 40 && fontSize > 20) {
-      fontSize -= 2;
-      ctx.font = `300 ${fontSize}px 'Space Grotesk', system-ui, sans-serif`;
-      // Reduce letter spacing slightly for very small fonts to save space
-      if (fontSize < 40) ctx.letterSpacing = "2px";
-    }
-    
-    ctx.fillText(text, canvasW / 2, canvasH / 2);
-    
-    const tex = new THREE.CanvasTexture(canvas);
-    // The canvas is power-of-two, so mipmaps keep the downscaled text
-    // smooth instead of crunchy when the card sits far from the camera.
-    tex.minFilter = THREE.LinearMipmapLinearFilter;
-    tex.magFilter = THREE.LinearFilter;
-    tex.anisotropy = gl.capabilities.getMaxAnisotropy();
-    tex.generateMipmaps = true;
+    // next/font registers Space Grotesk under a generated family name, so
+    // resolve it from the CSS variable rather than asking for it by name.
+    const family =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--font-display")
+        .trim() || "system-ui, sans-serif";
+    const weight = 700;
 
-    if (!live) {
-      tex.dispose();
-      return;
-    }
-    
-    setTexture(tex);
-    material.map = tex;
-    material.needsUpdate = true;
+    const draw = () => {
+      if (cancelled) return;
+
+      // Room for two lines: long titles (e.g. "Innovation Lead (AI &
+      // Product Management)") wrap instead of shrinking to illegibility.
+      const canvasW = 1024;
+      const canvasH = 256;
+      const maxW = canvasW - 40;
+      canvas.width = canvasW;
+      canvas.height = canvasH;
+
+      ctx.clearRect(0, 0, canvasW, canvasH);
+      ctx.fillStyle = themes[theme].eyebrow;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.letterSpacing = "2px"; // Bold glyphs are wide; keep tracking tight
+
+      const text = eyebrow.toUpperCase();
+      const widest = (lines: string[], size: number) => {
+        ctx.font = `${weight} ${size}px ${family}`;
+        return Math.max(...lines.map((l) => ctx.measureText(l).width));
+      };
+
+      // One line as large as fits; below 50px, wrap into two balanced lines.
+      let fontSize = 64;
+      let lines = [text];
+      while (widest(lines, fontSize) > maxW && fontSize > 50) fontSize -= 2;
+      if (widest(lines, fontSize) > maxW) {
+        const words = text.split(" ");
+        let best = lines;
+        let bestW = Infinity;
+        for (let i = 1; i < words.length; i++) {
+          const pair = [words.slice(0, i).join(" "), words.slice(i).join(" ")];
+          const w = widest(pair, fontSize);
+          if (w < bestW) {
+            bestW = w;
+            best = pair;
+          }
+        }
+        lines = best;
+        fontSize = 60;
+        while (widest(lines, fontSize) > maxW && fontSize > 28) fontSize -= 2;
+      }
+      ctx.font = `${weight} ${fontSize}px ${family}`;
+
+      // The last line sits at 3/4 height so the line nearest the card stays
+      // put; a second line grows upward.
+      const lineH = fontSize * 1.1;
+      lines.forEach((line, i) => {
+        const y = canvasH * 0.75 - (lines.length - 1 - i) * lineH;
+        ctx.fillText(line, canvasW / 2, y);
+      });
+
+      const tex = new THREE.CanvasTexture(canvas);
+      // The canvas is power-of-two, so mipmaps keep the downscaled text
+      // smooth instead of crunchy when the card sits far from the camera.
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.anisotropy = gl.capabilities.getMaxAnisotropy();
+      tex.generateMipmaps = true;
+
+      const old = material.map as THREE.Texture | null;
+      setTexture(tex);
+      material.map = tex;
+      material.needsUpdate = true;
+      old?.dispose();
+    };
+
+    document.fonts
+      .load(`${weight} 64px ${family}`)
+      .catch(() => {
+        // Fonts failing to resolve is cosmetic — system fallbacks are fine.
+      })
+      .then(draw);
 
     return () => {
-      live = false;
-      tex.dispose();
+      cancelled = true;
+    };
+  }, [eyebrow, gl, material, theme]);
+
+  useEffect(() => {
+    return () => {
+      (material.map as THREE.Texture | null)?.dispose();
       material.dispose();
     };
-  }, [eyebrow, gl, material]);
+  }, [material]);
 
   useFrame(() => {
     if (!meshRef.current) return;
@@ -282,10 +353,13 @@ function CardEyebrow({ eyebrow, width, height, anim, material: parentMaterial }:
 
   if (!texture) return null;
 
-  // Canvas aspect is 8:1 (1024x128). We can let it span the full width of the card.
-  const labelW = width * 0.95;
-  const labelH = labelW / 8;
-  const yOffset = height / 2 + labelH * 0.7;
+  // Canvas aspect is 4:1 (1024x256). Let it overhang the card slightly so
+  // long titles stay large — the grid gutters leave room either side. The
+  // offset seats the bottom text line (3/4 down the canvas) just above the
+  // card.
+  const labelW = width * 1.2;
+  const labelH = labelW / 4;
+  const yOffset = height / 2 + labelW * 0.0875 + labelH * 0.25;
 
   return (
     <mesh ref={meshRef} material={material} position={[0, yOffset, 0]}>
